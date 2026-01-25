@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TileDefinition" load_steps=2 format=3 uid="uid://c8ll4qgcbpunf"]
+
+[ext_resource type="Script" uid="uid://c4rbl3y8byl47" path="res://Resources/Terrain/tile_defenition.gd" id="1_t1eur"]
+
+[resource]
+script = ExtResource("1_t1eur")
+atlas_coords = Vector2i(1, 0)
+max_health = 1
+drop_chance = 0.0
+metadata/_custom_type_script = "uid://c4rbl3y8byl47"

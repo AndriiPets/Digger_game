@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TileDefinition" load_steps=2 format=3 uid="uid://d2pa0517bhe6o"]
+
+[ext_resource type="Script" uid="uid://c4rbl3y8byl47" path="res://Resources/Terrain/tile_defenition.gd" id="1_pvxp0"]
+
+[resource]
+script = ExtResource("1_pvxp0")
+display_name = "Bedrock"
+atlas_coords = Vector2i(5, 0)
+max_health = 999
+drop_chance = 0.0
+metadata/_custom_type_script = "uid://c4rbl3y8byl47"

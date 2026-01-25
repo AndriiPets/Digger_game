@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://q3gkxaqb0g24"]
+
+[ext_resource type="Script" uid="uid://1teegydqhma8" path="res://Objects/Player/player.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://qfsa8oxar5a6" path="res://Objects/Components/Inventory/inventory_component.gd" id="2_oansn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dig"]
+size = Vector2(16, 16)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_script")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+color = Color(0.2, 0.8, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="DigDetector" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DigDetector"]
+shape = SubResource("RectangleShape2D_dig")
+debug_color = Color(0.9, 0.2, 0.2, 0.4)
+
+[node name="Inventory" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_oansn")

@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="TerrainLayer" load_steps=11 format=3 uid="uid://biumhcgtb2qsp"]
+
+[ext_resource type="Script" uid="uid://dof72ljbcth16" path="res://Resources/Terrain/System/spawn_weight.gd" id="1_fpvxk"]
+[ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="2_6byvq"]
+[ext_resource type="Resource" uid="uid://ujbrqt3eeahy" path="res://Resources/Terrain/SilverVein.tres" id="2_pgyow"]
+[ext_resource type="Resource" uid="uid://c32tji6b7conn" path="res://Resources/Terrain/QuartzVein.tres" id="3_la1nu"]
+[ext_resource type="Resource" uid="uid://dtvba11yvvxtj" path="res://Resources/Terrain/Basalt.tres" id="5_f3un4"]
+[ext_resource type="Resource" uid="uid://bo413wd8v8b2w" path="res://Resources/Terrain/CrystalRock.tres" id="6_tojm2"]
+
+[sub_resource type="Resource" id="Resource_m7cgl"]
+script = ExtResource("1_fpvxk")
+block = ExtResource("2_pgyow")
+weight = 15.0
+metadata/_custom_type_script = "uid://dof72ljbcth16"
+
+[sub_resource type="Resource" id="Resource_cjqkp"]
+script = ExtResource("1_fpvxk")
+block = ExtResource("3_la1nu")
+weight = 5.0
+metadata/_custom_type_script = "uid://dof72ljbcth16"
+
+[sub_resource type="Resource" id="Resource_64jfy"]
+script = ExtResource("1_fpvxk")
+block = ExtResource("5_f3un4")
+weight = 60.0
+metadata/_custom_type_script = "uid://dof72ljbcth16"
+
+[sub_resource type="Resource" id="Resource_ahj5x"]
+script = ExtResource("1_fpvxk")
+block = ExtResource("6_tojm2")
+weight = 40.0
+metadata/_custom_type_script = "uid://dof72ljbcth16"
+
+[resource]
+script = ExtResource("2_6byvq")
+layer_name = "Depths"
+max_depth = 60
+structural_pool = Array[ExtResource("1_fpvxk")]([SubResource("Resource_64jfy"), SubResource("Resource_ahj5x")])
+resource_pool = Array[ExtResource("1_fpvxk")]([SubResource("Resource_m7cgl"), SubResource("Resource_cjqkp")])
+metadata/_custom_type_script = "uid://dl2u22xdxd8yj"

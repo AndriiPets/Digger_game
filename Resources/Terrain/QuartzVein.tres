@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TileDefinition" load_steps=2 format=3 uid="uid://c32tji6b7conn"]
+
+[ext_resource type="Script" uid="uid://c4rbl3y8byl47" path="res://Resources/Terrain/tile_defenition.gd" id="1_515rn"]
+
+[resource]
+script = ExtResource("1_515rn")
+display_name = "Ouartz"
+atlas_coords = Vector2i(4, 1)
+max_health = 14
+metadata/_custom_type_script = "uid://c4rbl3y8byl47"

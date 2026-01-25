@@ -1,0 +1,66 @@
+[gd_scene load_steps=19 format=4 uid="uid://cqhncinotcuh6"]
+
+[ext_resource type="PackedScene" uid="uid://b8x4q2j5w8k1" path="res://Objects/Terrain/TerrainManager.tscn" id="1_terrain"]
+[ext_resource type="Script" uid="uid://7ey75n33xsbr" path="res://Objects/Managers/game_manager.gd" id="1_vm3kb"]
+[ext_resource type="Texture2D" uid="uid://dav33anr6f6wx" path="res://Assets/Images/terrain_tileset.png" id="2_635xr"]
+[ext_resource type="PackedScene" uid="uid://q3gkxaqb0g24" path="res://Objects/Player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://Objects/UI/FloatingText/FloatingText.tscn" id="2_qk1kx"]
+[ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="4_66x0g"]
+[ext_resource type="Resource" uid="uid://chhdbv5j5q3a" path="res://Resources/Terrain/Layers/layer1_surface.tres" id="5_dk750"]
+[ext_resource type="Resource" uid="uid://d2pa0517bhe6o" path="res://Resources/Terrain/Bedrock.tres" id="6_bedrock"]
+[ext_resource type="Resource" uid="uid://dj1j6aoux5pna" path="res://Resources/Terrain/Layers/layer2_shelf.tres" id="6_y8ukn"]
+[ext_resource type="Resource" uid="uid://biumhcgtb2qsp" path="res://Resources/Terrain/Layers/layer3_depths.tres" id="7_72xxr"]
+[ext_resource type="PackedScene" uid="uid://dthmkjnj2uodq" path="res://Objects/Camera/GameCamera.tscn" id="7_camera"]
+[ext_resource type="PackedScene" path="res://Objects/Components/Drop/Drop.tscn" id="9_72xxr"]
+[ext_resource type="PackedScene" uid="uid://bwhk861k13gr4" path="res://Objects/UI/Timer/TimerUi.tscn" id="10_66x0g"]
+[ext_resource type="PackedScene" uid="uid://cs0lsmn0n0hmv" path="res://Objects/Components/SafeZone/SafeZone.tscn" id="11_safezone"]
+[ext_resource type="Script" uid="uid://qfsa8oxar5a6" path="res://Objects/Components/Inventory/inventory_component.gd" id="14_j3c8t"]
+[ext_resource type="PackedScene" uid="uid://dejcv0sd0s31y" path="res://Objects/UI/Encumbrance/EncumbranceUI.tscn" id="16_nxyhc"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_manual"]
+texture = ExtResource("2_635xr")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[sub_resource type="TileSet" id="TileSet_manual"]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_manual")
+
+[node name="TestScene" type="Node2D" node_paths=PackedStringArray("terrain_manager", "player", "safe_zone", "game_ui", "encumbrance_ui", "stash_inventory")]
+script = ExtResource("1_vm3kb")
+terrain_manager = NodePath("TerrainManager")
+player = NodePath("Player")
+safe_zone = NodePath("SafeZone")
+game_ui = NodePath("GameUI")
+encumbrance_ui = NodePath("EncumbranceUI")
+stash_inventory = NodePath("StashInventory")
+floating_text_scene = ExtResource("2_qk1kx")
+
+[node name="TerrainManager" parent="." instance=ExtResource("1_terrain")]
+tile_texture_atlas = ExtResource("2_635xr")
+terrain_layers = Array[ExtResource("4_66x0g")]([ExtResource("5_dk750"), ExtResource("6_y8ukn"), ExtResource("7_72xxr")])
+bedrock_definition = ExtResource("6_bedrock")
+default_drop_scene = ExtResource("9_72xxr")
+
+[node name="StaticTerrain" type="TileMapLayer" parent="."]
+tile_map_data = PackedByteArray("AAADAP//AAAAAAAAAAADAPz/AAAAAAAAAAADAP3/AAAAAAAAAAADAP7/AAAAAAAAAAD9//z/AAAAAAAAAAD+//z/AAAAAAAAAAD///z/AAAAAAAAAAAAAPz/AAAAAAAAAAABAPz/AAAAAAAAAAACAPz/AAAAAAAAAAD8/wAAAAAAAAAAAAD9/wAAAAAAAAAAAAD+/wAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAD7/wAAAAAAAAAAAAD6/wAAAAAAAAAAAAD5/wAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAD4/wAAAAAAAAAAAAD3/wAAAAAAAAAAAAD2/wAAAAAAAAAAAAD1/wAAAAAAAAAAAAD0/wAAAAAAAAAAAAAJAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAALAAAAAAAAAAAAAAAMAAAAAAAAAAAAAADz/wAAAAAAAAAAAAANAAAAAAAAAAAAAAD9////AAAAAAAAAAD9//7/AAAAAAAAAAD9//3/AAAAAAAAAAD//wAAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_manual")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(0, -32)
+
+[node name="GameCamera" parent="." instance=ExtResource("7_camera")]
+zoom = Vector2(2, 2)
+
+[node name="GameUI" parent="." instance=ExtResource("10_66x0g")]
+
+[node name="SafeZone" parent="." instance=ExtResource("11_safezone")]
+position = Vector2(16, 17)
+
+[node name="StashInventory" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("14_j3c8t")
+
+[node name="EncumbranceUI" parent="." instance=ExtResource("16_nxyhc")]

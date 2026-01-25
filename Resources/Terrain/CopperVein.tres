@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TileDefinition" load_steps=2 format=3 uid="uid://ts6l145cg0vl"]
+
+[ext_resource type="Script" uid="uid://c4rbl3y8byl47" path="res://Resources/Terrain/tile_defenition.gd" id="1_3chhi"]
+
+[resource]
+script = ExtResource("1_3chhi")
+display_name = "Copper"
+atlas_coords = Vector2i(2, 1)
+max_health = 6
+metadata/_custom_type_script = "uid://c4rbl3y8byl47"

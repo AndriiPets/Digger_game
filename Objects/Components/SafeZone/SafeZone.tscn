@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://cs0lsmn0n0hmv"]
+
+[ext_resource type="Script" uid="uid://byydk8ue08ghw" path="res://Objects/Components/SafeZone/safe_zone.gd" id="1_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
+size = Vector2(159, 129)
+
+[node name="SafeZone" type="Area2D"]
+collision_layer = 0
+monitorable = false
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, -48.5)
+shape = SubResource("RectangleShape2D_zone")
+debug_color = Color(0.3, 0.8, 0.3, 0.2)
