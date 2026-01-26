@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TerrainLayer" load_steps=7 format=3 uid="uid://d0o3ug2hlrf3h"]
+[gd_resource type="Resource" script_class="TerrainLayer" format=3 uid="uid://d0o3ug2hlrf3h"]
 
 [ext_resource type="Script" uid="uid://dof72ljbcth16" path="res://Resources/Terrain/System/spawn_weight.gd" id="1_djvaa"]
 [ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="2_dxwwi"]

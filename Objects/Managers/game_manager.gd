@@ -14,12 +14,15 @@ enum GameState {SAFE, RUN}
 @export_group("UI References")
 @export var game_ui: TimerUI
 @export var encumbrance_ui: EncumbranceUI
+@export var depth_ui: DepthUI
+@export var money_ui: MoneyUI # <--- NEW UI
 # We will attach the node in the scene, or spawn it dynamically
 @export var stash_inventory: InventoryComponent
 @export var floating_text_scene: PackedScene
 
 var _current_time: float
 var _current_state: GameState = GameState.SAFE
+var _total_money: int = 0 # <--- NEW MONEY TRACKER
 
 func _ready() -> void:
 	if safe_zone:
@@ -29,16 +32,18 @@ func _ready() -> void:
 	_connect_debug_signals()
 	_connect_gameplay_signals()
 	_reset_game()
+	
+	# Init Money UI
+	if money_ui:
+		money_ui.update_money(_total_money)
 
 func _connect_debug_signals() -> void:
 	# Connect Player Inventory
 	if player and player.inventory:
-		# We use unbind(2) to ignore the signal arguments (item, amount)
-		# because we just want to reprint the whole state
 		player.inventory.inventory_updated.connect(_print_global_inventory_state.unbind(2))
 		player.inventory.inventory_cleared.connect(_print_global_inventory_state)
 
-	# Connect Stash Inventory
+	# Connect Stash Inventory (Though strictly less used now that we auto-sell)
 	if stash_inventory:
 		stash_inventory.inventory_updated.connect(_print_global_inventory_state.unbind(2))
 		stash_inventory.inventory_cleared.connect(_print_global_inventory_state)
@@ -89,15 +94,30 @@ func _process(delta: float) -> void:
 			if _current_time <= 0:
 				_end_round()
 
+	# --- NEW DEPTH UPDATE ---
+	if depth_ui and player:
+		var grid_size = player.grid_size if "grid_size" in player else 32
+		var depth_meters = floor(player.global_position.y / float(grid_size))
+		depth_ui.update_depth(int(depth_meters))
+
 # --- LOGIC ---
 
 func _on_player_entered_safezone() -> void:
 	# If we are in the safe state or just returning, bank the items
-	if player and player.inventory and stash_inventory:
-		# Check if player actually has something to avoid empty spam
+	if player and player.inventory:
 		if player.inventory.current_weight > 0:
-			print("$$$ BANKING LOOT $$$")
-			player.inventory.transfer_to(stash_inventory)
+			# --- NEW MONEY CONVERSION LOGIC ---
+			var value = player.inventory.get_total_value()
+			_total_money += value
+			
+			if money_ui:
+				money_ui.update_money(_total_money)
+			
+			_spawn_floating_text("Sold: $%d" % value, Color.GOLD)
+			print("$$$ SOLD LOOT FOR $%d. TOTAL: $%d $$$" % [value, _total_money])
+			
+			# Clear inventory after selling
+			player.inventory.clear()
 
 func _reset_game() -> void:
 	_current_state = GameState.SAFE
@@ -107,7 +127,6 @@ func _reset_game() -> void:
 		player.velocity = Vector2.ZERO
 		player.global_position = player_start_pos
 		# Requirement: Player inventory resets on map reset
-		# (If they died or failed to bank, this wipes it)
 		if player.inventory:
 			player.inventory.clear()
 
@@ -130,7 +149,7 @@ func _end_round() -> void:
 
 # --- NEW DEBUG PRINTER ---
 func _print_global_inventory_state() -> void:
-	print("\n📊 === GLOBAL INVENTORY STATE === 📊")
+	print("\n📊 === GLOBAL STATE === 📊")
 
 	# Print Player
 	if player and player.inventory:
@@ -141,13 +160,8 @@ func _print_global_inventory_state() -> void:
 		print("[PLAYER] Not Found")
 
 	print("----------------------------------")
-
-	# Print Stash
-	if stash_inventory:
-		var s_weight = stash_inventory.current_weight
-		var s_items = stash_inventory.get_debug_string()
-		print("[STASH]  Weight: %.1f kg%s" % [s_weight, s_items])
-	else:
-		print("[STASH]  Not Found")
+	
+	# Print Money
+	print("[BANK]   Total Funds: $%d" % _total_money)
 
 	print("==================================\n")

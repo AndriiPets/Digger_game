@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TerrainLayer" load_steps=11 format=3 uid="uid://dj1j6aoux5pna"]
+[gd_resource type="Resource" script_class="TerrainLayer" format=3 uid="uid://dj1j6aoux5pna"]
 
 [ext_resource type="Script" uid="uid://dof72ljbcth16" path="res://Resources/Terrain/System/spawn_weight.gd" id="1_xnygr"]
 [ext_resource type="Resource" uid="uid://ts6l145cg0vl" path="res://Resources/Terrain/CopperVein.tres" id="2_4byjj"]

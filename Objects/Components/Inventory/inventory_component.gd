@@ -3,11 +3,12 @@ extends Node
 
 # Signals
 signal inventory_updated(item: TileDefinition, total_amount: int)
-signal inventory_changed_value(current_weight: float, max_weight: float) # <--- NEW for UI
+signal inventory_changed_value(current_weight: float, max_weight: float)
 signal inventory_cleared
 
 # Config
-@export var max_weight: float = 15.0 # <--- NEW LIMIT
+@export var max_weight: float = 15.0
+@export var is_infinite: bool = false
 
 # Storage
 var _storage: Dictionary = {}
@@ -23,8 +24,8 @@ func add_item(item: TileDefinition, amount: int = 1) -> bool:
 	
 	var weight_to_add = item.weight * amount
 	
-	# Check constraints
-	if current_weight + weight_to_add > max_weight:
+	# Check constraints (skip if infinite)
+	if not is_infinite and (current_weight + weight_to_add > max_weight):
 		return false # Rejected
 		
 	# Logic to add item
@@ -55,8 +56,15 @@ func transfer_to(target_inventory: InventoryComponent) -> void:
 	
 	clear()
 
-# --- NEW HELPER FOR DEBUGGING ---
-# Returns a formatted string of the contents instead of printing immediately
+# --- NEW: Calculate total value of items ---
+func get_total_value() -> int:
+	var total: int = 0
+	for item in _storage:
+		if item:
+			total += item.base_value * _storage[item]
+	return total
+
+# --- Helper for debugging ---
 func get_debug_string() -> String:
 	if _storage.is_empty():
 		return " (Empty)"

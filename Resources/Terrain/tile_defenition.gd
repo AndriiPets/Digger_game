@@ -8,7 +8,8 @@ extends Resource
 
 @export_group("Gameplay")
 @export var max_health: int = 3
-@export var weight: float = 1.0 # <--- NEW DEFAULT WEIGHT
+@export var weight: float = 1.0
+@export var base_value: int = 1 # <--- NEW VALUE
 @export var is_diggable: bool = true
 
 @export_group("Drops")
