@@ -1,0 +1,24 @@
+
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Objects/FX/DarknessOverlay/darkness_overlay.gd" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/darkness.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_darkness"]
+shader = ExtResource("2_shader")
+shader_parameter/player_screen_pos = Vector2(0, 0)
+shader_parameter/radius = 64.0
+shader_parameter/surface_y_screen = 0.0
+
+[node name="DarknessOverlay" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_script")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_darkness")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)

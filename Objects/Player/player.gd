@@ -68,7 +68,6 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 	# Handle Recoil Recovery
-	# We smoothly interpolate the offset back to zero
 	if _recoil_offset.length_squared() > 0.1:
 		_recoil_offset = _recoil_offset.lerp(Vector2.ZERO, recoil_recovery_speed * delta)
 	else:

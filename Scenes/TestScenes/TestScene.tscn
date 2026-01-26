@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="4_66x0g"]
 [ext_resource type="Resource" uid="uid://chhdbv5j5q3a" path="res://Resources/Terrain/Layers/layer1_surface.tres" id="5_dk750"]
 [ext_resource type="Resource" uid="uid://d2pa0517bhe6o" path="res://Resources/Terrain/Bedrock.tres" id="6_bedrock"]
-[ext_resource type="Resource" uid="uid://d0o3ug2hlrf3h" path="res://Resources/Terrain/Layers/layer0_intro.tres" id="6_bs1rv"]
 [ext_resource type="Resource" uid="uid://dj1j6aoux5pna" path="res://Resources/Terrain/Layers/layer2_shelf.tres" id="6_y8ukn"]
 [ext_resource type="Resource" uid="uid://biumhcgtb2qsp" path="res://Resources/Terrain/Layers/layer3_depths.tres" id="7_72xxr"]
 [ext_resource type="PackedScene" uid="uid://dthmkjnj2uodq" path="res://Objects/Camera/GameCamera.tscn" id="7_camera"]
@@ -17,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://cs0lsmn0n0hmv" path="res://Objects/Components/SafeZone/SafeZone.tscn" id="11_safezone"]
 [ext_resource type="Script" uid="uid://qfsa8oxar5a6" path="res://Objects/Components/Inventory/inventory_component.gd" id="14_j3c8t"]
 [ext_resource type="PackedScene" path="res://Objects/UI/Encumbrance/EncumbranceUI.tscn" id="16_nxyhc"]
+[ext_resource type="PackedScene" uid="uid://0wbaudgiw8we" path="res://Objects/FX/DarknessOverlay/DarknessOverlay.tscn" id="17_darkness"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_manual"]
 texture = ExtResource("2_635xr")
@@ -41,7 +41,7 @@ floating_text_scene = ExtResource("2_qk1kx")
 
 [node name="TerrainManager" parent="." instance=ExtResource("1_terrain")]
 tile_texture_atlas = ExtResource("2_635xr")
-terrain_layers = Array[ExtResource("4_66x0g")]([ExtResource("6_bs1rv"), ExtResource("5_dk750"), ExtResource("6_y8ukn"), ExtResource("7_72xxr")])
+terrain_layers = Array[ExtResource("4_66x0g")]([ExtResource("5_dk750"), ExtResource("6_y8ukn"), ExtResource("7_72xxr")])
 bedrock_definition = ExtResource("6_bedrock")
 default_drop_scene = ExtResource("9_72xxr")
 
@@ -65,3 +65,5 @@ unique_name_in_owner = true
 script = ExtResource("14_j3c8t")
 
 [node name="EncumbranceUI" parent="." instance=ExtResource("16_nxyhc")]
+
+[node name="DarknessOverlay" parent="." instance=ExtResource("17_darkness")]
