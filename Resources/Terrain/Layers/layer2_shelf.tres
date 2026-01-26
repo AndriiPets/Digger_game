@@ -34,6 +34,7 @@ metadata/_custom_type_script = "uid://dof72ljbcth16"
 [resource]
 script = ExtResource("2_hj3fm")
 layer_name = "Shelf"
+max_depth = 90
 structural_pool = Array[ExtResource("1_xnygr")]([SubResource("Resource_3ghvc"), SubResource("Resource_i4rru")])
 resource_pool = Array[ExtResource("1_xnygr")]([SubResource("Resource_l52a6"), SubResource("Resource_kvfn2")])
 metadata/_custom_type_script = "uid://dl2u22xdxd8yj"

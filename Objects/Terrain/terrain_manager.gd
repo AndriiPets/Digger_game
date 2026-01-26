@@ -3,6 +3,8 @@ extends Node2D
 
 signal block_broken(grid_pos: Vector2i, type: TileDefinition)
 
+enum DigStatus {NONE, HIT, DESTROYED}
+
 # --- Configuration ---
 @export_category("Map Settings")
 @export var grid_size: int = 32
@@ -23,6 +25,7 @@ signal block_broken(grid_pos: Vector2i, type: TileDefinition)
 const SOURCE_ID: int = 0
 
 @export var default_drop_scene: PackedScene
+@export var block_break_particles_scene: PackedScene
 
 # OPTIMIZATION: Store health as integers mapped to coordinates, not Nodes
 var _tile_health: Dictionary = {} # { Vector2i: int }
@@ -165,7 +168,15 @@ func _destroy_tile(coords: Vector2i) -> void:
 	
 	_tile_map.erase_cell(coords)
 	
-	# --- NEW DROP LOGIC ---
+	# --- VISUALS: Block Break Particles ---
+	if block_break_particles_scene:
+		var particles = block_break_particles_scene.instantiate() as BlockParticles
+		get_tree().current_scene.add_child(particles)
+		particles.global_position = world_pos
+		particles.setup(tile_texture_atlas, def.atlas_coords, grid_size)
+	# --------------------------------------
+
+	# --- DROPS: Item Drop Logic ---
 	if randf() <= def.drop_chance:
 		# Determine which scene to use (custom or default)
 		var scene_to_spawn = def.drop_scene if def.drop_scene else default_drop_scene
@@ -182,7 +193,7 @@ func _destroy_tile(coords: Vector2i) -> void:
 				# If it's our standard ItemDrop script, configure it
 				if drop is ItemDrop:
 					drop.setup(def, tile_texture_atlas)
-	# ----------------------
+	# ------------------------------
 		
 	block_broken.emit(coords, def)
 	
@@ -191,7 +202,7 @@ func _destroy_tile(coords: Vector2i) -> void:
 
 # --- Interaction API ---
 
-func try_dig(origin_global: Vector2, direction: Vector2) -> bool:
+func try_dig(origin_global: Vector2, direction: Vector2) -> DigStatus:
 	var local_origin = _tile_map.to_local(origin_global)
 	var player_cell = _tile_map.local_to_map(local_origin)
 	var best_dot = -1.0
@@ -207,10 +218,17 @@ func try_dig(origin_global: Vector2, direction: Vector2) -> bool:
 			best_cell = neighbor
 			found = true
 			
-	if found and best_dot > 0.5 and _tile_health.has(best_cell):
-		_damage_tile(best_cell, 1)
-		return true
-	return false
+	if found and best_dot > 0.5:
+		if _tile_health.has(best_cell):
+			_damage_tile(best_cell, 1)
+			
+			# Check if it was destroyed or just damaged
+			if _tile_health.has(best_cell):
+				return DigStatus.HIT
+			else:
+				return DigStatus.DESTROYED
+				
+	return DigStatus.NONE
 
 func _damage_tile(coords: Vector2i, amount: int) -> void:
 	if not _tile_health.has(coords): return

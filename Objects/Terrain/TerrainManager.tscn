@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://b8x4q2j5w8k1"]
+[gd_scene load_steps=3 format=3 uid="uid://b8x4q2j5w8k1"]
 
 [ext_resource type="Script" path="res://Objects/Terrain/terrain_manager.gd" id="1_terrain"]
+[ext_resource type="PackedScene" uid="uid://b4k8q2j5w8k2" path="res://Objects/FX/BlockParticles/BlockParticles.tscn" id="2_particles"]
 
 [node name="TerrainManager" type="Node2D" groups=["terrain"]]
 script = ExtResource("1_terrain")
+block_break_particles_scene = ExtResource("2_particles")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]

@@ -10,8 +10,18 @@ func update_display(current: float, maximum: float) -> void:
 	
 	label.text = "%.1f / %.1f kg" % [current, maximum]
 	
-	# Visual feedback: Turn red if full
-	if current >= maximum:
-		progress_bar.modulate = Color(1, 0.3, 0.3)
+	# Calculate ratio safely
+	var ratio: float = 0.0
+	if maximum > 0:
+		ratio = current / maximum
+	
+	# Color Logic based on encumbrance state
+	if ratio > 0.85:
+		# Heavy Encumbrance (> 85%)
+		progress_bar.modulate = Color(1, 0.2, 0.2) # Red
+	elif ratio > 0.70:
+		# Medium Encumbrance (70% - 85%)
+		progress_bar.modulate = Color(1, 1, 0.2) # Yellow
 	else:
+		# Light Encumbrance (0% - 70%)
 		progress_bar.modulate = Color.WHITE

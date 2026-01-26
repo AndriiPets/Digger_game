@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Resource_730d7"]
 script = ExtResource("1_yhmcf")
 block = ExtResource("2_gv4yt")
-weight = 8.0
+weight = 2.0
 metadata/_custom_type_script = "uid://dof72ljbcth16"
 
 [sub_resource type="Resource" id="Resource_nulwv"]
@@ -27,7 +27,7 @@ metadata/_custom_type_script = "uid://dof72ljbcth16"
 [resource]
 script = ExtResource("2_bqysu")
 layer_name = "Surface"
-max_depth = 20
+max_depth = 30
 structural_pool = Array[ExtResource("1_yhmcf")]([SubResource("Resource_nulwv"), SubResource("Resource_g42ux")])
 resource_pool = Array[ExtResource("1_yhmcf")]([SubResource("Resource_730d7")])
 metadata/_custom_type_script = "uid://dl2u22xdxd8yj"
