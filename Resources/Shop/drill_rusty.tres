@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://de2ula0cxarq8"]
+
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_0ljpv"]
+[ext_resource type="Texture2D" uid="uid://cet7i4yupcg1y" path="res://icon.svg" id="1_tsah5"]
+
+[resource]
+script = ExtResource("1_0ljpv")
+display_name = "Rusty Drill"
+cost = 10
+icon = ExtResource("1_tsah5")
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

@@ -19,7 +19,10 @@
 [ext_resource type="PackedScene" path="res://Objects/UI/Encumbrance/EncumbranceUI.tscn" id="16_nxyhc"]
 [ext_resource type="PackedScene" path="res://Objects/FX/DarknessOverlay/DarknessOverlay.tscn" id="17_darkness"]
 [ext_resource type="PackedScene" path="res://Objects/UI/Depth/DepthUI.tscn" id="18_depth"]
-[ext_resource type="PackedScene" uid="uid://beose71otjlhg" path="res://Objects/UI/Money/MoneyUI.tscn" id="20_kjb2r"]
+[ext_resource type="PackedScene" path="res://Objects/UI/Money/MoneyUI.tscn" id="20_kjb2r"]
+[ext_resource type="PackedScene" uid="uid://bnjex0towjvie" path="res://Objects/Buildings/Shop/ShopEntity.tscn" id="21_keqyh"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="22_thksi"]
+[ext_resource type="Resource" uid="uid://de2ula0cxarq8" path="res://Resources/Shop/drill_rusty.tres" id="23_mqddd"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_manual"]
 texture = ExtResource("2_635xr")
@@ -80,3 +83,7 @@ layer = 99
 [node name="DarknessOverlay" parent="." unique_id=306656075 instance=ExtResource("17_darkness")]
 
 [node name="MoneyUI" parent="." unique_id=719156879 instance=ExtResource("20_kjb2r")]
+
+[node name="ShopEntity" parent="." unique_id=272070926 instance=ExtResource("21_keqyh")]
+position = Vector2(-41, -66)
+items_for_sale = Array[ExtResource("22_thksi")]([ExtResource("23_mqddd")])
