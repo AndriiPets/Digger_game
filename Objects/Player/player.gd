@@ -5,78 +5,79 @@ extends CharacterBody2D
 signal item_collected(type: TileDefinition)
 signal inventory_full_rejected()
 
-# Exports
-@export_group("Movement")
-@export var speed: float = 150.0
-
-@export_group("Interaction")
-@export var grid_size: int = 32
-@export var dig_interval: float = 0.5
-@export var recoil_distance: float = 10.0
-@export var recoil_recovery_speed: float = 5.0
-
 # Components
 @onready var visual: ColorRect = $Visual
 @onready var dig_detector: Area2D = $DigDetector
 @onready var inventory: InventoryComponent = %Inventory
+@onready var stats: StatsComponent = $StatsComponent
+@onready var upgrades: UpgradeManager = $UpgradeManager
 
-# State
+# ... (Export variables remain the same) ...
+@export_group("Base Stats")
+@export var base_speed: float = 150.0
+@export var base_dig_interval: float = 0.5
+@export var grid_size: int = 32
+@export var recoil_distance: float = 10.0
+@export var recoil_recovery_speed: float = 5.0
+
+# ... (State variables remain the same) ...
 var _input_direction: Vector2 = Vector2.ZERO
 var _facing_direction: Vector2 = Vector2.RIGHT
 var _terrain_manager: TerrainManager
 var _speed_multiplier: float = 1.0
-
-# Visual State
 var _base_visual_pos: Vector2
 var _recoil_offset: Vector2 = Vector2.ZERO
-
-# Digging State
 var _dig_cooldown: float = 0.0
 var _debug_flash_timer: float = 0.0
 
 func _ready() -> void:
-	# Size the player to fit inside the grid slightly
+	add_to_group("player")
+	
+	stats.initialize("move_speed", base_speed)
+	stats.initialize("dig_speed", base_dig_interval)
+	stats.initialize("dig_damage", 1.0) # Base damage
+	
 	var player_size := float(grid_size) * 0.8
 	visual.size = Vector2(player_size, player_size)
-	# Center the visual and cache the base position
 	visual.position = - visual.size / 2
 	_base_visual_pos = visual.position
 
-	add_to_group("player")
-
-	# Setup detector size
 	var collision_shape: CollisionShape2D = dig_detector.get_child(0)
 	var rect := RectangleShape2D.new()
 	rect.size = Vector2(player_size, player_size) * 0.5
 	collision_shape.shape = rect
 
-	# Cache terrain reference
 	var terrain_nodes := get_tree().get_nodes_in_group("terrain")
 	if not terrain_nodes.is_empty():
 		_terrain_manager = terrain_nodes[0] as TerrainManager
 	
-	# Connect to inventory for speed calculation
 	if inventory:
 		inventory.inventory_changed_value.connect(_on_inventory_weight_changed)
-		# Initialize speed
 		_on_inventory_weight_changed(inventory.current_weight, inventory.max_weight)
 
+# --- NEW FUNCTION ---
+func reset_all_stats() -> void:
+	if stats:
+		stats.reset_modifiers()
+	if upgrades:
+		upgrades.clear_upgrades()
+	# Speed multiplier will be reset via inventory signal when inventory clears,
+	# but we can force it here just in case.
+	_speed_multiplier = 1.0
+# --------------------
+
 func _process(delta: float) -> void:
-	# Update visual flash timer independent of physics tick
 	if _debug_flash_timer > 0:
 		_debug_flash_timer -= delta
 		queue_redraw()
 
-	# Handle Recoil Recovery
 	if _recoil_offset.length_squared() > 0.1:
 		_recoil_offset = _recoil_offset.lerp(Vector2.ZERO, recoil_recovery_speed * delta)
 	else:
 		_recoil_offset = Vector2.ZERO
 	
-	# Apply visual offset (Base Position + Recoil)
 	visual.position = _base_visual_pos + _recoil_offset
 
-	# Request redraw if debug mode state changes
 	if Globals.debug_mode:
 		queue_redraw()
 
@@ -106,30 +107,27 @@ func _handle_input() -> void:
 		_input_direction = Vector2.ZERO
 
 func _handle_movement() -> void:
-	# Apply speed multiplier from encumbrance
-	velocity = _input_direction * speed * _speed_multiplier
+	var current_speed = stats.get_value("move_speed")
+	velocity = _input_direction * current_speed * _speed_multiplier
 	move_and_slide()
 
 func _handle_actions() -> void:
-	# Check for Dig button (Z) - Held down
 	if Input.is_key_pressed(KEY_Z):
 		if _dig_cooldown <= 0:
 			_try_manual_dig()
 
 func _try_manual_dig() -> void:
-	# Reset cooldown
-	_dig_cooldown = dig_interval
-
-	# Trigger visual flash for debug
+	var interval = stats.get_value("dig_speed")
+	interval = max(0.05, interval)
+	
+	_dig_cooldown = interval
 	_debug_flash_timer = 0.15
 	
-	if not _terrain_manager:
-		return
+	if not _terrain_manager: return
 
-	# Pass origin and facing direction to terrain manager
-	var status = _terrain_manager.try_dig(global_position, _facing_direction)
+	var damage_amount = int(stats.get_value("dig_damage"))
+	var status = _terrain_manager.try_dig(global_position, _facing_direction, damage_amount)
 
-	# Trigger Visual Recoil ONLY if we hit something but didn't destroy it
 	if status == TerrainManager.DigStatus.HIT:
 		_recoil_offset = - _facing_direction * recoil_distance
 
@@ -137,39 +135,16 @@ func _draw() -> void:
 	if Globals.debug_mode:
 		var start := Vector2.ZERO
 		var end := _facing_direction * 40.0
-
-		# Default color is Magenta, flash Red when attacking
 		var color := Color.MAGENTA
-		if _debug_flash_timer > 0:
-			color = Color.RED
-
-		var width := 4.0
-
-		# Draw shaft
-		draw_line(start, end, color, width)
-
-		# Draw arrow head
-		var angle := _facing_direction.angle()
-		var arrow_size := 10.0
-		var arrow_angle := PI / 4.0 # 45 degrees
-
-		var right_wing := end + Vector2(cos(angle + PI - arrow_angle), sin(angle + PI - arrow_angle)) * arrow_size
-		var left_wing := end + Vector2(cos(angle + PI + arrow_angle), sin(angle + PI + arrow_angle)) * arrow_size
-
-		draw_line(end, right_wing, color, width)
-		draw_line(end, left_wing, color, width)
+		if _debug_flash_timer > 0: color = Color.RED
+		draw_line(start, end, color, 4.0)
 
 func collect_item(item_type: TileDefinition) -> void:
 	if not inventory: return
-
-	# Try to add item
 	var success = inventory.add_item(item_type, 1)
-
 	if success:
 		item_collected.emit(item_type)
 	else:
-		# Item is effectively discarded (we do nothing with it),
-		# but we emit a signal so the Game Manager can show text.
 		inventory_full_rejected.emit()
 
 func _on_inventory_weight_changed(current_weight: float, max_weight: float) -> void:
@@ -177,9 +152,6 @@ func _on_inventory_weight_changed(current_weight: float, max_weight: float) -> v
 	if max_weight > 0:
 		ratio = current_weight / max_weight
 	
-	if ratio > 0.85:
-		_speed_multiplier = 0.5 # Heavy
-	elif ratio > 0.70:
-		_speed_multiplier = 0.75 # Medium
-	else:
-		_speed_multiplier = 1.0 # Light
+	if ratio > 0.85: _speed_multiplier = 0.5
+	elif ratio > 0.70: _speed_multiplier = 0.75
+	else: _speed_multiplier = 1.0

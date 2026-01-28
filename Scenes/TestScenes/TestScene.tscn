@@ -35,7 +35,7 @@ tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_manual")
 
-[node name="TestScene" type="Node2D" unique_id=1288944363 node_paths=PackedStringArray("terrain_manager", "player", "safe_zone", "game_ui", "encumbrance_ui", "depth_ui", "money_ui", "stash_inventory")]
+[node name="TestScene" type="Node2D" unique_id=1288944363 node_paths=PackedStringArray("terrain_manager", "player", "safe_zone", "game_ui", "encumbrance_ui", "depth_ui", "money_ui")]
 script = ExtResource("1_vm3kb")
 terrain_manager = NodePath("TerrainManager")
 player = NodePath("Player")
@@ -44,7 +44,6 @@ game_ui = NodePath("GameUI")
 encumbrance_ui = NodePath("EncumbranceUI")
 depth_ui = NodePath("DepthUI")
 money_ui = NodePath("MoneyUI")
-stash_inventory = NodePath("StashInventory")
 floating_text_scene = ExtResource("2_qk1kx")
 
 [node name="TerrainManager" parent="." unique_id=1871782656 instance=ExtResource("1_terrain")]

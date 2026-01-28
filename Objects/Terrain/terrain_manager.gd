@@ -202,7 +202,7 @@ func _destroy_tile(coords: Vector2i) -> void:
 
 # --- Interaction API ---
 
-func try_dig(origin_global: Vector2, direction: Vector2) -> DigStatus:
+func try_dig(origin_global: Vector2, direction: Vector2, damage_amount: int = 1) -> DigStatus:
 	var local_origin = _tile_map.to_local(origin_global)
 	var player_cell = _tile_map.local_to_map(local_origin)
 	var best_dot = -1.0
@@ -220,16 +220,16 @@ func try_dig(origin_global: Vector2, direction: Vector2) -> DigStatus:
 			
 	if found and best_dot > 0.5:
 		if _tile_health.has(best_cell):
-			_damage_tile(best_cell, 1)
+			# NEW: Use the passed damage amount
+			_damage_tile(best_cell, damage_amount)
 			
-			# Check if it was destroyed or just damaged
 			if _tile_health.has(best_cell):
 				return DigStatus.HIT
 			else:
 				return DigStatus.DESTROYED
 				
 	return DigStatus.NONE
-
+	
 func _damage_tile(coords: Vector2i, amount: int) -> void:
 	if not _tile_health.has(coords): return
 	
