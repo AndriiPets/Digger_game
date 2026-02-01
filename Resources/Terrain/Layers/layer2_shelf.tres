@@ -1,22 +1,28 @@
 [gd_resource type="Resource" script_class="TerrainLayer" format=3 uid="uid://dj1j6aoux5pna"]
 
 [ext_resource type="Script" uid="uid://dof72ljbcth16" path="res://Resources/Terrain/System/spawn_weight.gd" id="1_xnygr"]
-[ext_resource type="Resource" uid="uid://ts6l145cg0vl" path="res://Resources/Terrain/CopperVein.tres" id="2_4byjj"]
+[ext_resource type="Resource" uid="uid://ts6l145cg0vl" path="res://Resources/Terrain/OreSilver.tres" id="2_2a5qc"]
 [ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="2_hj3fm"]
-[ext_resource type="Resource" uid="uid://ujbrqt3eeahy" path="res://Resources/Terrain/SilverVein.tres" id="3_2a5qc"]
+[ext_resource type="Resource" uid="uid://ujbrqt3eeahy" path="res://Resources/Terrain/OreGold.tres" id="3_abq2l"]
+[ext_resource type="Resource" uid="uid://b7dpktnttpvb2" path="res://Resources/Terrain/OreIron.tres" id="4_3nf5d"]
 [ext_resource type="Resource" uid="uid://d2oeyrjyfxhdp" path="res://Resources/Terrain/Stone.tres" id="5_abq2l"]
 [ext_resource type="Resource" uid="uid://dtvba11yvvxtj" path="res://Resources/Terrain/Basalt.tres" id="6_3nf5d"]
 
 [sub_resource type="Resource" id="Resource_l52a6"]
 script = ExtResource("1_xnygr")
-block = ExtResource("2_4byjj")
-weight = 12.0
+block = ExtResource("2_2a5qc")
 metadata/_custom_type_script = "uid://dof72ljbcth16"
 
 [sub_resource type="Resource" id="Resource_kvfn2"]
 script = ExtResource("1_xnygr")
-block = ExtResource("3_2a5qc")
+block = ExtResource("3_abq2l")
 weight = 5.0
+metadata/_custom_type_script = "uid://dof72ljbcth16"
+
+[sub_resource type="Resource" id="Resource_c1wyn"]
+script = ExtResource("1_xnygr")
+block = ExtResource("4_3nf5d")
+weight = 15.0
 metadata/_custom_type_script = "uid://dof72ljbcth16"
 
 [sub_resource type="Resource" id="Resource_3ghvc"]
@@ -36,5 +42,5 @@ script = ExtResource("2_hj3fm")
 layer_name = "Shelf"
 max_depth = 90
 structural_pool = Array[ExtResource("1_xnygr")]([SubResource("Resource_3ghvc"), SubResource("Resource_i4rru")])
-resource_pool = Array[ExtResource("1_xnygr")]([SubResource("Resource_l52a6"), SubResource("Resource_kvfn2")])
+resource_pool = Array[ExtResource("1_xnygr")]([SubResource("Resource_l52a6"), SubResource("Resource_kvfn2"), SubResource("Resource_c1wyn")])
 metadata/_custom_type_script = "uid://dl2u22xdxd8yj"

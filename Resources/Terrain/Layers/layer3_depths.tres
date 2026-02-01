@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dof72ljbcth16" path="res://Resources/Terrain/System/spawn_weight.gd" id="1_fpvxk"]
 [ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="2_6byvq"]
-[ext_resource type="Resource" uid="uid://ujbrqt3eeahy" path="res://Resources/Terrain/SilverVein.tres" id="2_pgyow"]
-[ext_resource type="Resource" uid="uid://c32tji6b7conn" path="res://Resources/Terrain/QuartzVein.tres" id="3_la1nu"]
+[ext_resource type="Resource" uid="uid://ujbrqt3eeahy" path="res://Resources/Terrain/OreGold.tres" id="2_pgyow"]
+[ext_resource type="Resource" uid="uid://c32tji6b7conn" path="res://Resources/Terrain/OreCrystal.tres" id="3_la1nu"]
 [ext_resource type="Resource" uid="uid://dtvba11yvvxtj" path="res://Resources/Terrain/Basalt.tres" id="5_f3un4"]
 [ext_resource type="Resource" uid="uid://bo413wd8v8b2w" path="res://Resources/Terrain/CrystalRock.tres" id="6_tojm2"]
 

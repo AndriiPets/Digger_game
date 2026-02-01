@@ -7,4 +7,8 @@
 script = ExtResource("1_terrain")
 block_break_particles_scene = ExtResource("2_particles")
 
-[node name="TileMapLayer" type="TileMapLayer" parent="."]
+[node name="BaseLayer" type="TileMapLayer" parent="."]
+use_parent_material = true
+
+[node name="OreLayer" type="TileMapLayer" parent="."]
+use_parent_material = true

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TileDefinition" format=3 uid="uid://ujbrqt3eeahy"]
+
+[ext_resource type="Script" uid="uid://c4rbl3y8byl47" path="res://Resources/Terrain/tile_defenition.gd" id="1_dwvqk"]
+
+[resource]
+script = ExtResource("1_dwvqk")
+display_name = "Gold"
+atlas_coords = Vector2i(4, 1)
+is_ore = true
+max_health = 9
+health_bonus = 9
+metadata/_custom_type_script = "uid://c4rbl3y8byl47"

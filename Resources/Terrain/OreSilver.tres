@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TileDefinition" format=3 uid="uid://ts6l145cg0vl"]
+
+[ext_resource type="Script" uid="uid://c4rbl3y8byl47" path="res://Resources/Terrain/tile_defenition.gd" id="1_barpg"]
+
+[resource]
+script = ExtResource("1_barpg")
+display_name = "Silver"
+atlas_coords = Vector2i(3, 1)
+is_ore = true
+max_health = 6
+health_bonus = 6
+metadata/_custom_type_script = "uid://c4rbl3y8byl47"

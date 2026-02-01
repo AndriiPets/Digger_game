@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TileDefinition" format=3 uid="uid://b7dpktnttpvb2"]
+
+[ext_resource type="Script" uid="uid://c4rbl3y8byl47" path="res://Resources/Terrain/tile_defenition.gd" id="1_kg7hg"]
+
+[resource]
+script = ExtResource("1_kg7hg")
+display_name = "Iron"
+atlas_coords = Vector2i(2, 1)
+is_ore = true
+max_health = 4
+health_bonus = 4
+metadata/_custom_type_script = "uid://c4rbl3y8byl47"

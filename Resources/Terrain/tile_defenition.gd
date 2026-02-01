@@ -7,9 +7,11 @@ extends Resource
 @export var color_tint: Color = Color.WHITE
 
 @export_group("Gameplay")
+@export var is_ore: bool = false
 @export var max_health: int = 3
+@export var health_bonus: int = 0 # NEW: Ores add this to the base block's health
 @export var weight: float = 1.0
-@export var base_value: int = 1 # <--- NEW VALUE
+@export var base_value: int = 1
 @export var is_diggable: bool = true
 
 @export_group("Drops")

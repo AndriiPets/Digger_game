@@ -18,22 +18,28 @@ enum DigStatus {NONE, HIT, DESTROYED}
 
 @export_category("Global Settings")
 @export var global_resource_chance: float = 0.2
-@export var resource_hp_bonus: int = 2
 
 # --- Internal State ---
-@onready var _tile_map: TileMapLayer = $TileMapLayer
+@onready var _base_layer: TileMapLayer = $BaseLayer
+@onready var _ore_layer: TileMapLayer = $OreLayer
 const SOURCE_ID: int = 0
 
 @export var default_drop_scene: PackedScene
 @export var block_break_particles_scene: PackedScene
 
-# OPTIMIZATION: Store health as integers mapped to coordinates, not Nodes
+# Stores total health of the cell (Base + Ore)
 var _tile_health: Dictionary = {} # { Vector2i: int }
-var _tile_data_map: Dictionary = {} # { Vector2i: TileDefinition }
+
+# Stores Definitions
+var _base_data_map: Dictionary = {} # { Vector2i: TileDefinition }
+var _ore_data_map: Dictionary = {} # { Vector2i: TileDefinition }
+
 var _cached_definitions: Array[TileDefinition] = []
 
 func _ready() -> void:
-	_tile_map.show_behind_parent = true
+	_base_layer.show_behind_parent = true
+	_ore_layer.show_behind_parent = true
+	
 	_cache_all_definitions()
 	
 	if _cached_definitions.is_empty() or not tile_texture_atlas:
@@ -58,6 +64,7 @@ func _setup_tileset() -> void:
 	var tile_set := TileSet.new()
 	tile_set.tile_size = Vector2i(grid_size, grid_size)
 	
+	# Physics only needed on Base Layer
 	tile_set.add_physics_layer(0)
 	tile_set.set_physics_layer_collision_layer(0, 1)
 	tile_set.set_physics_layer_collision_mask(0, 1)
@@ -72,9 +79,13 @@ func _setup_tileset() -> void:
 			source.create_tile(def.atlas_coords)
 		var td = source.get_tile_data(def.atlas_coords, 0)
 		td.modulate = def.color_tint
+		
+		# Only add collision if it's NOT an ore (Visual overlay doesn't need physics)
+		# Or if you want the ore to share the definition but use it differently:
 		_add_collision_to_tile(td)
 		
-	_tile_map.tile_set = tile_set
+	_base_layer.tile_set = tile_set
+	_ore_layer.tile_set = tile_set
 
 func _add_collision_to_tile(tile_data: TileData) -> void:
 	var s: float = float(grid_size) / 2.0
@@ -89,10 +100,11 @@ func _add_collision_to_tile(tile_data: TileData) -> void:
 # --- Generation Logic ---
 
 func regenerate_map() -> void:
-	_tile_map.clear()
-	# OPTIMIZATION: We no longer need to queue_free thousands of child nodes
+	_base_layer.clear()
+	_ore_layer.clear()
 	_tile_health.clear()
-	_tile_data_map.clear()
+	_base_data_map.clear()
+	_ore_data_map.clear()
 	
 	var half_w: int = int(float(map_width) / 2.0)
 	
@@ -102,12 +114,13 @@ func regenerate_map() -> void:
 		for x in range(-half_w - 1, half_w + 2):
 			var coords = Vector2i(x, y)
 			
+			# Borders / Bedrock
 			if x == -half_w - 1 or x == half_w + 1 or y == map_height:
-				_create_tile_at(coords, bedrock_definition)
+				_create_tile_at(coords, bedrock_definition, null)
 				continue
 			
 			if active_layer:
-				_generate_tile_from_layer(coords, active_layer)
+				_generate_composite_tile(coords, active_layer)
 
 func _get_layer_for_depth(y: int) -> TerrainLayer:
 	for layer in terrain_layers:
@@ -115,19 +128,17 @@ func _get_layer_for_depth(y: int) -> TerrainLayer:
 			return layer
 	return terrain_layers.back() if not terrain_layers.is_empty() else null
 
-func _generate_tile_from_layer(coords: Vector2i, layer: TerrainLayer) -> void:
-	var final_block: TileDefinition = _pick_weighted(layer.structural_pool)
-	if not final_block: return
+func _generate_composite_tile(coords: Vector2i, layer: TerrainLayer) -> void:
+	# 1. Pick Structural Block (Base)
+	var base_block: TileDefinition = _pick_weighted(layer.structural_pool)
+	if not base_block: return
 	
-	var final_hp: int = final_block.max_health
-	
+	# 2. Pick Resource Overlay (Ore)
+	var ore_block: TileDefinition = null
 	if not layer.resource_pool.is_empty() and randf() <= global_resource_chance:
-		var resource_def = _pick_weighted(layer.resource_pool)
-		if resource_def:
-			final_block = resource_def
-			final_hp = _calculate_resource_hp(layer, final_block)
-
-	_create_tile_at(coords, final_block, final_hp)
+		ore_block = _pick_weighted(layer.resource_pool)
+	
+	_create_tile_at(coords, base_block, ore_block)
 
 func _pick_weighted(pool: Array[SpawnWeight]) -> TileDefinition:
 	if pool.is_empty(): return null
@@ -146,73 +157,93 @@ func _pick_weighted(pool: Array[SpawnWeight]) -> TileDefinition:
 	
 	return pool[0].block
 
-func _calculate_resource_hp(layer: TerrainLayer, resource: TileDefinition) -> int:
-	return resource.max_health + resource_hp_bonus
-
-func _create_tile_at(coords: Vector2i, def: TileDefinition, custom_hp: int = -1) -> void:
-	if not def: return
-	_tile_map.set_cell(coords, SOURCE_ID, def.atlas_coords)
-	_tile_data_map[coords] = def
+func _create_tile_at(coords: Vector2i, base: TileDefinition, ore: TileDefinition) -> void:
+	if not base: return
 	
-	if def.is_diggable:
-		# OPTIMIZATION: Store HP in dictionary, do NOT create a Node
-		var hp = custom_hp if custom_hp > 0 else def.max_health
-		_tile_health[coords] = hp
+	# 1. Place Base
+	_base_layer.set_cell(coords, SOURCE_ID, base.atlas_coords)
+	_base_data_map[coords] = base
+	
+	# 2. Place Ore (if any)
+	if ore:
+		_ore_layer.set_cell(coords, SOURCE_ID, ore.atlas_coords)
+		_ore_data_map[coords] = ore
+	
+	# 3. Calculate Combined Health
+	if base.is_diggable:
+		var total_hp = base.max_health
+		if ore:
+			total_hp += ore.health_bonus
+		
+		_tile_health[coords] = total_hp
 
 func _destroy_tile(coords: Vector2i) -> void:
-	if not _tile_data_map.has(coords): return
-	var def = _tile_data_map[coords]
+	if not _base_data_map.has(coords): return
 	
-	# Get position center of the tile
-	var world_pos = to_global(_tile_map.map_to_local(coords))
+	var base_def = _base_data_map[coords]
+	var ore_def = _ore_data_map.get(coords, null)
 	
-	_tile_map.erase_cell(coords)
+	var world_pos = to_global(_base_layer.map_to_local(coords))
 	
-	# --- VISUALS: Block Break Particles ---
+	# --- VISUALS ---
+	_base_layer.erase_cell(coords)
+	_ore_layer.erase_cell(coords)
+	
+	# Particles (Use base block texture for particles usually, or could mix)
 	if block_break_particles_scene:
 		var particles = block_break_particles_scene.instantiate() as BlockParticles
 		get_tree().current_scene.add_child(particles)
 		particles.global_position = world_pos
-		particles.setup(tile_texture_atlas, def.atlas_coords, grid_size)
-	# --------------------------------------
+		particles.setup(tile_texture_atlas, base_def.atlas_coords, grid_size)
 
-	# --- DROPS: Item Drop Logic ---
-	if randf() <= def.drop_chance:
-		# Determine which scene to use (custom or default)
-		var scene_to_spawn = def.drop_scene if def.drop_scene else default_drop_scene
-		
-		if scene_to_spawn:
-			# Determine amount
-			var count = randi_range(def.min_drops, def.max_drops)
-			
-			for i in range(count):
-				var drop = scene_to_spawn.instantiate()
-				get_tree().current_scene.add_child(drop)
-				drop.global_position = world_pos
-				
-				# If it's our standard ItemDrop script, configure it
-				if drop is ItemDrop:
-					drop.setup(def, tile_texture_atlas)
-	# ------------------------------
-		
-	block_broken.emit(coords, def)
+	# --- DROPS ---
+	# 1. Drop Base Item
+	_spawn_drops_for(base_def, world_pos)
 	
+	# 2. Drop Ore Item (if it existed)
+	if ore_def:
+		_spawn_drops_for(ore_def, world_pos)
+		# Emit signal for the Ore primarily as it's the "event" usually, 
+		# or emit for base. Let's emit for base first.
+		block_broken.emit(coords, ore_def)
+	else:
+		block_broken.emit(coords, base_def)
+	
+	# Cleanup Data
 	_tile_health.erase(coords)
-	_tile_data_map.erase(coords)
+	_base_data_map.erase(coords)
+	if _ore_data_map.has(coords):
+		_ore_data_map.erase(coords)
+
+func _spawn_drops_for(def: TileDefinition, pos: Vector2) -> void:
+	if randf() > def.drop_chance: return
+	
+	var scene_to_spawn = def.drop_scene if def.drop_scene else default_drop_scene
+	if not scene_to_spawn: return
+	
+	var count = randi_range(def.min_drops, def.max_drops)
+	for i in range(count):
+		var drop = scene_to_spawn.instantiate()
+		get_tree().current_scene.add_child(drop)
+		drop.global_position = pos
+		if drop is ItemDrop:
+			drop.setup(def, tile_texture_atlas)
 
 # --- Interaction API ---
 
 func try_dig(origin_global: Vector2, direction: Vector2, damage_amount: int = 1) -> DigStatus:
-	var local_origin = _tile_map.to_local(origin_global)
-	var player_cell = _tile_map.local_to_map(local_origin)
+	var local_origin = _base_layer.to_local(origin_global)
+	var player_cell = _base_layer.local_to_map(local_origin)
 	var best_dot = -1.0
 	var best_cell: Vector2i
 	var found = false
 	
 	for offset in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
 		var neighbor = player_cell + offset
-		if not _tile_data_map.has(neighbor) or not _tile_data_map[neighbor].is_diggable: continue
-		var dot = direction.dot((_tile_map.map_to_local(neighbor) - local_origin).normalized())
+		if not _base_data_map.has(neighbor): continue
+		if not _base_data_map[neighbor].is_diggable: continue
+		
+		var dot = direction.dot((_base_layer.map_to_local(neighbor) - local_origin).normalized())
 		if dot > best_dot:
 			best_dot = dot
 			best_cell = neighbor
@@ -220,7 +251,6 @@ func try_dig(origin_global: Vector2, direction: Vector2, damage_amount: int = 1)
 			
 	if found and best_dot > 0.5:
 		if _tile_health.has(best_cell):
-			# NEW: Use the passed damage amount
 			_damage_tile(best_cell, damage_amount)
 			
 			if _tile_health.has(best_cell):
@@ -235,7 +265,6 @@ func _damage_tile(coords: Vector2i, amount: int) -> void:
 	
 	_tile_health[coords] -= amount
 	
-	# OPTIMIZATION: Request redraw only when health changes if debugging
 	if Globals.debug_mode:
 		queue_redraw()
 		
@@ -245,9 +274,6 @@ func _damage_tile(coords: Vector2i, amount: int) -> void:
 # --- Debug ---
 
 func _process(_delta: float) -> void:
-	# OPTIMIZATION: Only redraw every frame if strictly necessary. 
-	# Moving queue_redraw to _damage_tile is usually better, but if you want 
-	# to see the text follow the camera smoothly, keep it here.
 	if Globals.debug_mode:
 		queue_redraw()
 
@@ -258,17 +284,18 @@ func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	var font_size := 12
 	
-	# OPTIMIZATION: Do not draw health for every single block.
-	# Only draw for blocks that are damaged, or perhaps close to player (not implemented here)
 	for coords: Vector2i in _tile_health:
-		var current_hp = _tile_health[coords]
-		var max_hp = _tile_data_map[coords].max_health
+		# Check max HP vs Current HP
+		if not _base_data_map.has(coords): continue
 		
-		# Only draw if health is different than max, or if it's a special resource
-		if current_hp == max_hp:
-			continue
+		var base = _base_data_map[coords]
+		var ore = _ore_data_map.get(coords, null)
+		var max_hp = base.max_health + (ore.health_bonus if ore else 0)
+		
+		var current_hp = _tile_health[coords]
+		if current_hp == max_hp: continue
 			
-		var local_pos := _tile_map.map_to_local(coords)
+		var local_pos := _base_layer.map_to_local(coords)
 		var text := str(current_hp)
 		var text_size := font.get_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, font_size)
 		var draw_pos := local_pos + Vector2(-text_size.x / 2, text_size.y / 3)
