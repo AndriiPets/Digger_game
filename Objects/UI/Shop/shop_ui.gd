@@ -151,7 +151,7 @@ func _confirm_selection() -> void:
 			_show_warning("Item already purchased!")
 			return
 
-		if _current_wallet < selected_item.cost:
+		if _current_wallet < selected_item.cost and not Globals.debt:
 			_show_warning("Not enough money!")
 			return
 			
@@ -193,7 +193,7 @@ func _update_visuals() -> void:
 				cost_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5)) # Gray
 			else:
 				cost_label.text = "$ %d" % item.cost
-				if _current_wallet >= item.cost:
+				if _current_wallet >= item.cost or Globals.debt:
 					cost_label.add_theme_color_override("font_color", Color(1, 0.84, 0)) # Gold
 				else:
 					cost_label.add_theme_color_override("font_color", Color(1, 0.2, 0.2)) # Red

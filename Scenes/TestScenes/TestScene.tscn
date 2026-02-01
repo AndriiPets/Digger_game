@@ -23,6 +23,8 @@
 [ext_resource type="PackedScene" uid="uid://bnjex0towjvie" path="res://Objects/Buildings/Shop/ShopEntity.tscn" id="21_keqyh"]
 [ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="22_thksi"]
 [ext_resource type="Resource" uid="uid://de2ula0cxarq8" path="res://Resources/Shop/drill_rusty.tres" id="23_mqddd"]
+[ext_resource type="Resource" uid="uid://svh7ivrtfav6" path="res://Resources/Shop/harness_rusty.tres" id="24_l0m60"]
+[ext_resource type="Resource" uid="uid://dlcibhyx266mc" path="res://Resources/Shop/clock_rusty.tres" id="25_wo0q1"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_manual"]
 texture = ExtResource("2_635xr")
@@ -85,4 +87,4 @@ layer = 99
 
 [node name="ShopEntity" parent="." unique_id=272070926 instance=ExtResource("21_keqyh")]
 position = Vector2(-41, -66)
-items_for_sale = Array[ExtResource("22_thksi")]([ExtResource("23_mqddd")])
+items_for_sale = Array[ExtResource("22_thksi")]([ExtResource("23_mqddd"), ExtResource("24_l0m60"), ExtResource("25_wo0q1")])

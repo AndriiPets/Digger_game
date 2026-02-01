@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://dlcibhyx266mc"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_bxibg"]
+[ext_resource type="Script" uid="uid://d1edyhwfdcpus" path="res://Resources/Upgrades/Effects/time_upgrade.gd" id="2_i43ps"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_l6546"]
+
+[sub_resource type="Resource" id="Resource_sh4yg"]
+script = ExtResource("2_i43ps")
+amount = 10.0
+metadata/_custom_type_script = "uid://d1edyhwfdcpus"
+
+[resource]
+script = ExtResource("2_l6546")
+id = "Rusty_Clock"
+display_name = "Rusty Clock"
+description = "Increase run time, use before the run"
+cost = 10
+effects = Array[ExtResource("1_bxibg")]([SubResource("Resource_sh4yg")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

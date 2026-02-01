@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://svh7ivrtfav6"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_1lcd5"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_sqopq"]
+[ext_resource type="Script" uid="uid://dsdixutlqso60" path="res://Resources/Upgrades/Effects/weight_upgrade.gd" id="2_tf8ow"]
+
+[sub_resource type="Resource" id="Resource_ss1ca"]
+script = ExtResource("2_tf8ow")
+metadata/_custom_type_script = "uid://dsdixutlqso60"
+
+[resource]
+script = ExtResource("2_sqopq")
+id = "Rusty_Harness"
+display_name = "Rusty Harness"
+description = "Increase weight limit"
+cost = 10
+effects = Array[ExtResource("1_1lcd5")]([SubResource("Resource_ss1ca")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

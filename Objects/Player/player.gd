@@ -12,7 +12,7 @@ signal inventory_full_rejected()
 @onready var stats: StatsComponent = $StatsComponent
 @onready var upgrades: UpgradeManager = $UpgradeManager
 
-# ... (Export variables remain the same) ...
+# Exports
 @export_group("Base Stats")
 @export var base_speed: float = 150.0
 @export var base_dig_interval: float = 0.5
@@ -20,7 +20,7 @@ signal inventory_full_rejected()
 @export var recoil_distance: float = 10.0
 @export var recoil_recovery_speed: float = 5.0
 
-# ... (State variables remain the same) ...
+# State
 var _input_direction: Vector2 = Vector2.ZERO
 var _facing_direction: Vector2 = Vector2.RIGHT
 var _terrain_manager: TerrainManager
@@ -33,10 +33,22 @@ var _debug_flash_timer: float = 0.0
 func _ready() -> void:
 	add_to_group("player")
 	
+	# Connect signal to listen for upgrades
+	stats.stat_changed.connect(_on_stat_changed)
+	
+	# Initialize Stats
 	stats.initialize("move_speed", base_speed)
 	stats.initialize("dig_speed", base_dig_interval)
-	stats.initialize("dig_damage", 1.0) # Base damage
+	stats.initialize("dig_damage", 1.0)
 	
+	# NEW: Initialize Time Bonus (starts at 0)
+	stats.initialize("time_bonus", 0.0)
+	
+	# NEW: Initialize Weight from Inventory Component's default
+	if inventory:
+		stats.initialize("max_weight", inventory.max_weight)
+	
+	# ... (Visual Setup) ...
 	var player_size := float(grid_size) * 0.8
 	visual.size = Vector2(player_size, player_size)
 	visual.position = - visual.size / 2
@@ -55,16 +67,24 @@ func _ready() -> void:
 		inventory.inventory_changed_value.connect(_on_inventory_weight_changed)
 		_on_inventory_weight_changed(inventory.current_weight, inventory.max_weight)
 
-# --- NEW FUNCTION ---
+# NEW: Sync stats to actual components
+func _on_stat_changed(stat_name: String, new_value: float) -> void:
+	if stat_name == "max_weight" and inventory:
+		inventory.max_weight = new_value
+		# Force UI update
+		inventory.inventory_changed_value.emit(inventory.current_weight, inventory.max_weight)
+		# Re-check speed penalty logic
+		_on_inventory_weight_changed(inventory.current_weight, inventory.max_weight)
+
+# ... (Rest of Reset Logic) ...
 func reset_all_stats() -> void:
 	if stats:
 		stats.reset_modifiers()
 	if upgrades:
 		upgrades.clear_upgrades()
-	# Speed multiplier will be reset via inventory signal when inventory clears,
-	# but we can force it here just in case.
 	_speed_multiplier = 1.0
-# --------------------
+
+# ... (Standard Process/Physics functions omitted for brevity, they remain unchanged) ...
 
 func _process(delta: float) -> void:
 	if _debug_flash_timer > 0:

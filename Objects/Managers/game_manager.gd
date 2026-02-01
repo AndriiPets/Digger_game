@@ -18,13 +18,11 @@ enum GameState {SAFE, RUN}
 @export var money_ui: MoneyUI
 @export var floating_text_scene: PackedScene
 
-# Changed from _total_money to total_money (Public)
-var total_money: int = 0
+var total_money: int = 10
 var _current_time: float
 var _current_state: GameState = GameState.SAFE
 
 func _ready() -> void:
-	# Add to group so ShopEntity can find us
 	add_to_group("game_manager")
 	
 	if safe_zone:
@@ -55,7 +53,7 @@ func _connect_gameplay_signals() -> void:
 				shop.shop_ui.item_purchased.connect(try_purchase_upgrade)
 
 func try_purchase_upgrade(item: ShopItem) -> void:
-	if total_money >= item.cost:
+	if total_money >= item.cost or Globals.debt:
 		total_money -= item.cost
 		if money_ui: money_ui.update_money(total_money)
 		
@@ -102,7 +100,14 @@ func _on_player_entered_safezone() -> void:
 
 func _reset_game() -> void:
 	_current_state = GameState.SAFE
-	_current_time = round_time
+	
+	# NEW: Calculate Time based on stats
+	var bonus_time = 0.0
+	if player and player.stats:
+		bonus_time = player.stats.get_value("time_bonus")
+	
+	_current_time = round_time + bonus_time
+	
 	if player:
 		player.velocity = Vector2.ZERO
 		player.global_position = player_start_pos

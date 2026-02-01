@@ -1,6 +1,7 @@
 extends Node
 
 var debug_mode: bool = false
+var debt: bool = true
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:

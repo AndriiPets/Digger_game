@@ -11,7 +11,9 @@ metadata/_custom_type_script = "uid://cft83d2y48kr2"
 
 [resource]
 script = ExtResource("1_0ljpv")
+id = "Rusty_Drill"
 display_name = "Rusty Drill"
+description = "Increase drill dmage"
 cost = 10
 icon = ExtResource("1_tsah5")
 effects = Array[ExtResource("1_3xncf")]([SubResource("Resource_nkxf1")])
