@@ -12,3 +12,6 @@ use_parent_material = true
 
 [node name="OreLayer" type="TileMapLayer" parent="."]
 use_parent_material = true
+
+[node name="DamageLayer" type="TileMapLayer" parent="."]
+use_parent_material = true

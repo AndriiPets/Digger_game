@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://dgjvn67uxdwkm" path="res://Objects/UI/FloatingText/FloatingText.tscn" id="2_qk1kx"]
 [ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="4_66x0g"]
 [ext_resource type="Resource" uid="uid://chhdbv5j5q3a" path="res://Resources/Terrain/Layers/layer1_surface.tres" id="5_dk750"]
+[ext_resource type="Texture2D" uid="uid://bkphjo15n4tpy" path="res://Assets/Images/cracks.png" id="5_wo0q1"]
 [ext_resource type="Resource" uid="uid://d2pa0517bhe6o" path="res://Resources/Terrain/Bedrock.tres" id="6_bedrock"]
 [ext_resource type="Resource" uid="uid://d0o3ug2hlrf3h" path="res://Resources/Terrain/Layers/layer0_intro.tres" id="6_bs1rv"]
 [ext_resource type="Resource" uid="uid://dj1j6aoux5pna" path="res://Resources/Terrain/Layers/layer2_shelf.tres" id="6_y8ukn"]
@@ -50,6 +51,7 @@ floating_text_scene = ExtResource("2_qk1kx")
 
 [node name="TerrainManager" parent="." unique_id=1871782656 instance=ExtResource("1_terrain")]
 tile_texture_atlas = ExtResource("2_635xr")
+damage_texture_atlas = ExtResource("5_wo0q1")
 terrain_layers = Array[ExtResource("4_66x0g")]([ExtResource("6_bs1rv"), ExtResource("5_dk750"), ExtResource("6_y8ukn"), ExtResource("7_72xxr")])
 bedrock_definition = ExtResource("6_bedrock")
 default_drop_scene = ExtResource("9_72xxr")
@@ -85,6 +87,22 @@ layer = 99
 
 [node name="MoneyUI" parent="." unique_id=719156879 instance=ExtResource("20_kjb2r")]
 
-[node name="ShopEntity" parent="." unique_id=272070926 instance=ExtResource("21_keqyh")]
-position = Vector2(-41, -66)
-items_for_sale = Array[ExtResource("22_thksi")]([ExtResource("23_mqddd"), ExtResource("24_l0m60"), ExtResource("25_wo0q1")])
+[node name="DrillShop" parent="." unique_id=272070926 instance=ExtResource("21_keqyh")]
+position = Vector2(-60, -66)
+shop_id = "drill_shop"
+shop_name = "Drills"
+items_for_sale = Array[ExtResource("22_thksi")]([ExtResource("23_mqddd")])
+
+[node name="HarnessShop" parent="." unique_id=272070927 instance=ExtResource("21_keqyh")]
+position = Vector2(0, -66)
+shop_id = "harness_shop"
+shop_name = "Harnesses"
+items_for_sale = Array[ExtResource("22_thksi")]([ExtResource("24_l0m60")])
+start_locked = true
+
+[node name="ClockShop" parent="." unique_id=272070928 instance=ExtResource("21_keqyh")]
+position = Vector2(60, -66)
+shop_id = "clock_shop"
+shop_name = "Clocks"
+items_for_sale = Array[ExtResource("22_thksi")]([ExtResource("25_wo0q1")])
+start_locked = true

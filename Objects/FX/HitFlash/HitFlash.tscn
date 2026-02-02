@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://b8y9k2j5w8k1"]
+
+[ext_resource type="Script" path="res://Objects/FX/HitFlash/hit_flash.gd" id="1_script"]
+[ext_resource type="Shader" path="res://Shaders/flash.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_flash"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/flash_intensity = 0.0
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+
+[node name="HitFlash" type="Sprite2D"]
+z_index = 5
+material = SubResource("ShaderMaterial_flash")
+script = ExtResource("1_script")

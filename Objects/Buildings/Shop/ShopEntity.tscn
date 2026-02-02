@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://diacuiwkgx6q6" path="res://Objects/Buildings/Shop/shop_entity.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://Objects/UI/Shop/ShopUI.tscn" id="2_ui"]
+[ext_resource type="PackedScene" path="res://Objects/UI/Shop/ShopUnlockUI.tscn" id="3_unlock_ui"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shop"]
 size = Vector2(64, 64)
@@ -40,4 +41,7 @@ text = "[Z]"
 horizontal_alignment = 1
 
 [node name="ShopUI" parent="." unique_id=499872910 instance=ExtResource("2_ui")]
+visible = false
+
+[node name="ShopUnlockUI" parent="." instance=ExtResource("3_unlock_ui")]
 visible = false

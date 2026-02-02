@@ -7,10 +7,12 @@ enum DigStatus {NONE, HIT, DESTROYED}
 
 # --- Configuration ---
 @export_category("Map Settings")
+@export var is_persistent: bool = true
 @export var grid_size: int = 32
 @export var map_width: int = 25
 @export var map_height: int = 250
 @export var tile_texture_atlas: Texture2D
+@export var damage_texture_atlas: Texture2D
 
 @export_category("Layer Configuration")
 @export var terrain_layers: Array[TerrainLayer] = []
@@ -22,23 +24,28 @@ enum DigStatus {NONE, HIT, DESTROYED}
 # --- Internal State ---
 @onready var _base_layer: TileMapLayer = $BaseLayer
 @onready var _ore_layer: TileMapLayer = $OreLayer
-const SOURCE_ID: int = 0
+@onready var _damage_layer: TileMapLayer = $DamageLayer
+
+const SOURCE_ID_TERRAIN: int = 0
+const SOURCE_ID_DAMAGE: int = 1
 
 @export var default_drop_scene: PackedScene
 @export var block_break_particles_scene: PackedScene
 
 # Stores total health of the cell (Base + Ore)
-var _tile_health: Dictionary = {} # { Vector2i: int }
+var _tile_health: Dictionary = {}
 
 # Stores Definitions
-var _base_data_map: Dictionary = {} # { Vector2i: TileDefinition }
-var _ore_data_map: Dictionary = {} # { Vector2i: TileDefinition }
+var _base_data_map: Dictionary = {}
+var _ore_data_map: Dictionary = {}
 
 var _cached_definitions: Array[TileDefinition] = []
+var _has_generated: bool = false # NEW: Tracks if map exists
 
 func _ready() -> void:
 	_base_layer.show_behind_parent = true
 	_ore_layer.show_behind_parent = true
+	_damage_layer.show_behind_parent = true
 	
 	_cache_all_definitions()
 	
@@ -64,28 +71,38 @@ func _setup_tileset() -> void:
 	var tile_set := TileSet.new()
 	tile_set.tile_size = Vector2i(grid_size, grid_size)
 	
-	# Physics only needed on Base Layer
 	tile_set.add_physics_layer(0)
 	tile_set.set_physics_layer_collision_layer(0, 1)
 	tile_set.set_physics_layer_collision_mask(0, 1)
 	
+	# 1. Terrain Source
 	var source := TileSetAtlasSource.new()
 	source.texture = tile_texture_atlas
 	source.texture_region_size = Vector2i(grid_size, grid_size)
-	tile_set.add_source(source, SOURCE_ID)
+	tile_set.add_source(source, SOURCE_ID_TERRAIN)
 	
 	for def in _cached_definitions:
 		if not source.has_tile(def.atlas_coords):
 			source.create_tile(def.atlas_coords)
 		var td = source.get_tile_data(def.atlas_coords, 0)
 		td.modulate = def.color_tint
-		
-		# Only add collision if it's NOT an ore (Visual overlay doesn't need physics)
-		# Or if you want the ore to share the definition but use it differently:
 		_add_collision_to_tile(td)
+	
+	# 2. Damage Source
+	if damage_texture_atlas:
+		var dmg_source := TileSetAtlasSource.new()
+		dmg_source.texture = damage_texture_atlas
+		dmg_source.texture_region_size = Vector2i(grid_size, grid_size)
+		
+		# Create tiles for (0,0), (1,0), (2,0)
+		for x in range(3):
+			dmg_source.create_tile(Vector2i(x, 0))
+			
+		tile_set.add_source(dmg_source, SOURCE_ID_DAMAGE)
 		
 	_base_layer.tile_set = tile_set
 	_ore_layer.tile_set = tile_set
+	_damage_layer.tile_set = tile_set
 
 func _add_collision_to_tile(tile_data: TileData) -> void:
 	var s: float = float(grid_size) / 2.0
@@ -100,8 +117,14 @@ func _add_collision_to_tile(tile_data: TileData) -> void:
 # --- Generation Logic ---
 
 func regenerate_map() -> void:
+	# NEW: Persistence Check
+	if is_persistent and _has_generated:
+		print("TerrainManager: Persisting existing map.")
+		return
+
 	_base_layer.clear()
 	_ore_layer.clear()
+	_damage_layer.clear()
 	_tile_health.clear()
 	_base_data_map.clear()
 	_ore_data_map.clear()
@@ -114,13 +137,14 @@ func regenerate_map() -> void:
 		for x in range(-half_w - 1, half_w + 2):
 			var coords = Vector2i(x, y)
 			
-			# Borders / Bedrock
 			if x == -half_w - 1 or x == half_w + 1 or y == map_height:
 				_create_tile_at(coords, bedrock_definition, null)
 				continue
 			
 			if active_layer:
 				_generate_composite_tile(coords, active_layer)
+	
+	_has_generated = true # Mark as generated
 
 func _get_layer_for_depth(y: int) -> TerrainLayer:
 	for layer in terrain_layers:
@@ -129,11 +153,9 @@ func _get_layer_for_depth(y: int) -> TerrainLayer:
 	return terrain_layers.back() if not terrain_layers.is_empty() else null
 
 func _generate_composite_tile(coords: Vector2i, layer: TerrainLayer) -> void:
-	# 1. Pick Structural Block (Base)
 	var base_block: TileDefinition = _pick_weighted(layer.structural_pool)
 	if not base_block: return
 	
-	# 2. Pick Resource Overlay (Ore)
 	var ore_block: TileDefinition = null
 	if not layer.resource_pool.is_empty() and randf() <= global_resource_chance:
 		ore_block = _pick_weighted(layer.resource_pool)
@@ -160,16 +182,13 @@ func _pick_weighted(pool: Array[SpawnWeight]) -> TileDefinition:
 func _create_tile_at(coords: Vector2i, base: TileDefinition, ore: TileDefinition) -> void:
 	if not base: return
 	
-	# 1. Place Base
-	_base_layer.set_cell(coords, SOURCE_ID, base.atlas_coords)
+	_base_layer.set_cell(coords, SOURCE_ID_TERRAIN, base.atlas_coords)
 	_base_data_map[coords] = base
 	
-	# 2. Place Ore (if any)
 	if ore:
-		_ore_layer.set_cell(coords, SOURCE_ID, ore.atlas_coords)
+		_ore_layer.set_cell(coords, SOURCE_ID_TERRAIN, ore.atlas_coords)
 		_ore_data_map[coords] = ore
 	
-	# 3. Calculate Combined Health
 	if base.is_diggable:
 		var total_hp = base.max_health
 		if ore:
@@ -182,34 +201,26 @@ func _destroy_tile(coords: Vector2i) -> void:
 	
 	var base_def = _base_data_map[coords]
 	var ore_def = _ore_data_map.get(coords, null)
-	
 	var world_pos = to_global(_base_layer.map_to_local(coords))
 	
-	# --- VISUALS ---
 	_base_layer.erase_cell(coords)
 	_ore_layer.erase_cell(coords)
+	_damage_layer.erase_cell(coords)
 	
-	# Particles (Use base block texture for particles usually, or could mix)
 	if block_break_particles_scene:
 		var particles = block_break_particles_scene.instantiate() as BlockParticles
 		get_tree().current_scene.add_child(particles)
 		particles.global_position = world_pos
 		particles.setup(tile_texture_atlas, base_def.atlas_coords, grid_size)
 
-	# --- DROPS ---
-	# 1. Drop Base Item
 	_spawn_drops_for(base_def, world_pos)
 	
-	# 2. Drop Ore Item (if it existed)
 	if ore_def:
 		_spawn_drops_for(ore_def, world_pos)
-		# Emit signal for the Ore primarily as it's the "event" usually, 
-		# or emit for base. Let's emit for base first.
 		block_broken.emit(coords, ore_def)
 	else:
 		block_broken.emit(coords, base_def)
 	
-	# Cleanup Data
 	_tile_health.erase(coords)
 	_base_data_map.erase(coords)
 	if _ore_data_map.has(coords):
@@ -263,13 +274,46 @@ func try_dig(origin_global: Vector2, direction: Vector2, damage_amount: int = 1)
 func _damage_tile(coords: Vector2i, amount: int) -> void:
 	if not _tile_health.has(coords): return
 	
-	_tile_health[coords] -= amount
+	# NEW: TRIGGER VFX
+	# Get block definition to know which atlas coords to flash
+	var block_def = _base_data_map[coords]
+	var target_atlas_coords = block_def.atlas_coords
+	# If there is ore, maybe we want to flash the ore texture? 
+	# For now, let's flash the base block texture to keep it consistent with the shape.
 	
+	var world_pos = to_global(_base_layer.map_to_local(coords))
+	VFXManager.play_tile_hit_effect(world_pos, tile_texture_atlas, target_atlas_coords, grid_size)
+
+	_tile_health[coords] -= amount
+	var current_hp = _tile_health[coords]
+	
+	if current_hp <= 0:
+		_destroy_tile(coords)
+	else:
+		if damage_texture_atlas:
+			var base = _base_data_map[coords]
+			var ore = _ore_data_map.get(coords, null)
+			var max_hp = base.max_health + (ore.health_bonus if ore else 0)
+			
+			var hp_ratio = float(current_hp) / float(max_hp)
+			var damage_ratio = 1.0 - hp_ratio
+			
+			var tile_coords = Vector2i(-1, -1)
+			
+			if damage_ratio >= 0.8:
+				tile_coords = Vector2i(2, 0) # Stage 3
+			elif damage_ratio >= 0.6:
+				tile_coords = Vector2i(1, 0) # Stage 2
+			elif damage_ratio >= 0.2:
+				tile_coords = Vector2i(0, 0) # Stage 1
+			
+			if tile_coords.x != -1:
+				_damage_layer.set_cell(coords, SOURCE_ID_DAMAGE, tile_coords)
+			else:
+				_damage_layer.erase_cell(coords)
+
 	if Globals.debug_mode:
 		queue_redraw()
-		
-	if _tile_health[coords] <= 0:
-		_destroy_tile(coords)
 
 # --- Debug ---
 
@@ -285,7 +329,6 @@ func _draw() -> void:
 	var font_size := 12
 	
 	for coords: Vector2i in _tile_health:
-		# Check max HP vs Current HP
 		if not _base_data_map.has(coords): continue
 		
 		var base = _base_data_map[coords]

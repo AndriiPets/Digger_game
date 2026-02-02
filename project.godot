@@ -21,6 +21,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Globals="*res://Objects/Globals/global_variables.gd"
+VFXManager="*uid://c1broe50qhn3p"
 
 [rendering]
 
