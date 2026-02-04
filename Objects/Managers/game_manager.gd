@@ -3,7 +3,7 @@ extends Node
 
 enum GameState {SAFE, RUN}
 
-@export var round_time: float = 90.0
+@export var round_time: float = 60.0
 @export var player_start_pos: Vector2 = Vector2(0, -32)
 
 @export_group("References")

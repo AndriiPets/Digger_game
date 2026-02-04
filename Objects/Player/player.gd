@@ -41,14 +41,13 @@ func _ready() -> void:
 	stats.initialize("dig_speed", base_dig_interval)
 	stats.initialize("dig_damage", 1.0)
 	
-	# NEW: Initialize Time Bonus (starts at 0)
+	# Initialize Time Bonus (starts at 0)
 	stats.initialize("time_bonus", 0.0)
 	
-	# NEW: Initialize Weight from Inventory Component's default
+	# Initialize Weight from Inventory Component's default
 	if inventory:
 		stats.initialize("max_weight", inventory.max_weight)
 	
-	# ... (Visual Setup) ...
 	var player_size := float(grid_size) * 0.8
 	visual.size = Vector2(player_size, player_size)
 	visual.position = - visual.size / 2
@@ -67,7 +66,6 @@ func _ready() -> void:
 		inventory.inventory_changed_value.connect(_on_inventory_weight_changed)
 		_on_inventory_weight_changed(inventory.current_weight, inventory.max_weight)
 
-# NEW: Sync stats to actual components
 func _on_stat_changed(stat_name: String, new_value: float) -> void:
 	if stat_name == "max_weight" and inventory:
 		inventory.max_weight = new_value
@@ -76,15 +74,12 @@ func _on_stat_changed(stat_name: String, new_value: float) -> void:
 		# Re-check speed penalty logic
 		_on_inventory_weight_changed(inventory.current_weight, inventory.max_weight)
 
-# ... (Rest of Reset Logic) ...
 func reset_all_stats() -> void:
 	if stats:
 		stats.reset_modifiers()
 	if upgrades:
 		upgrades.clear_upgrades()
 	_speed_multiplier = 1.0
-
-# ... (Standard Process/Physics functions omitted for brevity, they remain unchanged) ...
 
 func _process(delta: float) -> void:
 	if _debug_flash_timer > 0:
@@ -159,9 +154,10 @@ func _draw() -> void:
 		if _debug_flash_timer > 0: color = Color.RED
 		draw_line(start, end, color, 4.0)
 
-func collect_item(item_type: TileDefinition) -> void:
+# UPDATED: Accept specific value for depth scaling logic
+func collect_item(item_type: TileDefinition, value: int = -1) -> void:
 	if not inventory: return
-	var success = inventory.add_item(item_type, 1)
+	var success = inventory.add_item(item_type, 1, value)
 	if success:
 		item_collected.emit(item_type)
 	else:

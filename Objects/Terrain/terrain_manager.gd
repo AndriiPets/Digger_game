@@ -40,7 +40,12 @@ var _base_data_map: Dictionary = {}
 var _ore_data_map: Dictionary = {}
 
 var _cached_definitions: Array[TileDefinition] = []
-var _has_generated: bool = false # NEW: Tracks if map exists
+var _has_generated: bool = false
+
+#---Balance vars
+const BASE_DEPTH_MULTIPLIER: float = 20.0
+const BASE_HP_MULTIPLIER: float = 1.15
+const BASE_VALUE_MULTIPLIER: float = 1.3
 
 func _ready() -> void:
 	_base_layer.show_behind_parent = true
@@ -117,7 +122,7 @@ func _add_collision_to_tile(tile_data: TileData) -> void:
 # --- Generation Logic ---
 
 func regenerate_map() -> void:
-	# NEW: Persistence Check
+	# Persistence Check
 	if is_persistent and _has_generated:
 		print("TerrainManager: Persisting existing map.")
 		return
@@ -144,7 +149,7 @@ func regenerate_map() -> void:
 			if active_layer:
 				_generate_composite_tile(coords, active_layer)
 	
-	_has_generated = true # Mark as generated
+	_has_generated = true
 
 func _get_layer_for_depth(y: int) -> TerrainLayer:
 	for layer in terrain_layers:
@@ -156,8 +161,16 @@ func _generate_composite_tile(coords: Vector2i, layer: TerrainLayer) -> void:
 	var base_block: TileDefinition = _pick_weighted(layer.structural_pool)
 	if not base_block: return
 	
+	# NEW: Calculate Depth Scale (DS)
+	# Formula: DS = 1 + (depth / 50)
+	var depth_scale: float = 1.0 + (float(coords.y) / BASE_DEPTH_MULTIPLIER)
+	
+	# NEW: Scale Ore Spawn Chance
+	# Formula: Chance = BaseChance * DS^0.25
+	var scaled_chance = global_resource_chance * pow(depth_scale, 0.25)
+	
 	var ore_block: TileDefinition = null
-	if not layer.resource_pool.is_empty() and randf() <= global_resource_chance:
+	if not layer.resource_pool.is_empty() and randf() <= scaled_chance:
 		ore_block = _pick_weighted(layer.resource_pool)
 	
 	_create_tile_at(coords, base_block, ore_block)
@@ -194,7 +207,12 @@ func _create_tile_at(coords: Vector2i, base: TileDefinition, ore: TileDefinition
 		if ore:
 			total_hp += ore.health_bonus
 		
-		_tile_health[coords] = total_hp
+		# NEW: Scale Block Health
+		# Formula: HP = BaseHP * DS^1.15
+		var depth_scale: float = 1.0 + (float(coords.y) / BASE_DEPTH_MULTIPLIER)
+		var scaled_hp = float(total_hp) * pow(depth_scale, BASE_HP_MULTIPLIER)
+		
+		_tile_health[coords] = int(scaled_hp)
 
 func _destroy_tile(coords: Vector2i) -> void:
 	if not _base_data_map.has(coords): return
@@ -213,10 +231,15 @@ func _destroy_tile(coords: Vector2i) -> void:
 		particles.global_position = world_pos
 		particles.setup(tile_texture_atlas, base_def.atlas_coords, grid_size)
 
-	_spawn_drops_for(base_def, world_pos)
+	# NEW: Scale Value for Drops
+	# Formula: Value = BaseValue * DS^1.3
+	var depth_scale: float = 1.0 + (float(coords.y) / BASE_DEPTH_MULTIPLIER)
+	var value_multiplier: float = pow(depth_scale, BASE_VALUE_MULTIPLIER)
+
+	_spawn_drops_for(base_def, world_pos, value_multiplier)
 	
 	if ore_def:
-		_spawn_drops_for(ore_def, world_pos)
+		_spawn_drops_for(ore_def, world_pos, value_multiplier)
 		block_broken.emit(coords, ore_def)
 	else:
 		block_broken.emit(coords, base_def)
@@ -226,19 +249,22 @@ func _destroy_tile(coords: Vector2i) -> void:
 	if _ore_data_map.has(coords):
 		_ore_data_map.erase(coords)
 
-func _spawn_drops_for(def: TileDefinition, pos: Vector2) -> void:
+func _spawn_drops_for(def: TileDefinition, pos: Vector2, value_mult: float = 1.0) -> void:
 	if randf() > def.drop_chance: return
 	
 	var scene_to_spawn = def.drop_scene if def.drop_scene else default_drop_scene
 	if not scene_to_spawn: return
 	
 	var count = randi_range(def.min_drops, def.max_drops)
+	var scaled_value = int(float(def.base_value) * value_mult)
+	
 	for i in range(count):
 		var drop = scene_to_spawn.instantiate()
 		get_tree().current_scene.add_child(drop)
 		drop.global_position = pos
 		if drop is ItemDrop:
-			drop.setup(def, tile_texture_atlas)
+			# Pass the calculated value to the drop
+			drop.setup(def, tile_texture_atlas, scaled_value)
 
 # --- Interaction API ---
 
@@ -274,12 +300,9 @@ func try_dig(origin_global: Vector2, direction: Vector2, damage_amount: int = 1)
 func _damage_tile(coords: Vector2i, amount: int) -> void:
 	if not _tile_health.has(coords): return
 	
-	# NEW: TRIGGER VFX
-	# Get block definition to know which atlas coords to flash
+	# TRIGGER VFX
 	var block_def = _base_data_map[coords]
 	var target_atlas_coords = block_def.atlas_coords
-	# If there is ore, maybe we want to flash the ore texture? 
-	# For now, let's flash the base block texture to keep it consistent with the shape.
 	
 	var world_pos = to_global(_base_layer.map_to_local(coords))
 	VFXManager.play_tile_hit_effect(world_pos, tile_texture_atlas, target_atlas_coords, grid_size)
@@ -293,7 +316,11 @@ func _damage_tile(coords: Vector2i, amount: int) -> void:
 		if damage_texture_atlas:
 			var base = _base_data_map[coords]
 			var ore = _ore_data_map.get(coords, null)
-			var max_hp = base.max_health + (ore.health_bonus if ore else 0)
+			
+			# Recalculate max_hp for visual ratio, including scaling
+			var depth_scale: float = 1.0 + (float(coords.y) / BASE_DEPTH_MULTIPLIER)
+			var raw_max_hp = base.max_health + (ore.health_bonus if ore else 0)
+			var max_hp = int(float(raw_max_hp) * pow(depth_scale, BASE_HP_MULTIPLIER))
 			
 			var hp_ratio = float(current_hp) / float(max_hp)
 			var damage_ratio = 1.0 - hp_ratio
@@ -331,12 +358,7 @@ func _draw() -> void:
 	for coords: Vector2i in _tile_health:
 		if not _base_data_map.has(coords): continue
 		
-		var base = _base_data_map[coords]
-		var ore = _ore_data_map.get(coords, null)
-		var max_hp = base.max_health + (ore.health_bonus if ore else 0)
-		
 		var current_hp = _tile_health[coords]
-		if current_hp == max_hp: continue
 			
 		var local_pos := _base_layer.map_to_local(coords)
 		var text := str(current_hp)

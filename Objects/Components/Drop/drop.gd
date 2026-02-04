@@ -11,6 +11,8 @@ var _target: Node2D
 var _velocity: Vector2 = Vector2.ZERO
 var _collect_phase: bool = false
 var _resource_type: TileDefinition
+# NEW: Store specific value (calculated based on depth)
+var _drop_value: int = 0
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -31,8 +33,15 @@ func _ready() -> void:
 	await get_tree().create_timer(0.35).timeout
 	_collect_phase = true
 
-func setup(type: TileDefinition, texture_atlas: Texture2D) -> void:
+func setup(type: TileDefinition, texture_atlas: Texture2D, value_override: int = -1) -> void:
 	_resource_type = type
+	
+	# If an override is provided (from depth scaling), use it. 
+	# Otherwise default to base value.
+	if value_override >= 0:
+		_drop_value = value_override
+	else:
+		_drop_value = type.base_value
 	
 	# Setup visual based on the block definition
 	if sprite and texture_atlas:
@@ -62,5 +71,6 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is Player:
-		body.collect_item(_resource_type)
+		# Pass the specific scaled value to the player
+		body.collect_item(_resource_type, _drop_value)
 		queue_free()

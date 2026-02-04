@@ -9,4 +9,5 @@ atlas_coords = Vector2i(4, 1)
 is_ore = true
 max_health = 9
 health_bonus = 9
+base_value = 8
 metadata/_custom_type_script = "uid://c4rbl3y8byl47"
