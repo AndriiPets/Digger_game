@@ -14,7 +14,7 @@
 [ext_resource type="Resource" uid="uid://biumhcgtb2qsp" path="res://Resources/Terrain/Layers/layer3_depths.tres" id="7_72xxr"]
 [ext_resource type="PackedScene" uid="uid://dthmkjnj2uodq" path="res://Objects/Camera/GameCamera.tscn" id="7_camera"]
 [ext_resource type="PackedScene" uid="uid://gno0t7q04vvb" path="res://Objects/Components/Drop/Drop.tscn" id="9_72xxr"]
-[ext_resource type="PackedScene" uid="uid://bwhk861k13gr4" path="res://Objects/UI/Timer/TimerUi.tscn" id="10_66x0g"]
+[ext_resource type="PackedScene" path="res://Objects/UI/Energy/EnergyUI.tscn" id="10_energy"]
 [ext_resource type="PackedScene" uid="uid://cs0lsmn0n0hmv" path="res://Objects/Components/SafeZone/SafeZone.tscn" id="11_safezone"]
 [ext_resource type="Script" uid="uid://qfsa8oxar5a6" path="res://Objects/Components/Inventory/inventory_component.gd" id="14_j3c8t"]
 [ext_resource type="PackedScene" path="res://Objects/UI/Encumbrance/EncumbranceUI.tscn" id="16_nxyhc"]
@@ -38,12 +38,12 @@ tile_size = Vector2i(32, 32)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_manual")
 
-[node name="TestScene" type="Node2D" unique_id=1288944363 node_paths=PackedStringArray("terrain_manager", "player", "safe_zone", "game_ui", "encumbrance_ui", "depth_ui", "money_ui")]
+[node name="TestScene" type="Node2D" unique_id=1288944363 node_paths=PackedStringArray("terrain_manager", "player", "safe_zone", "energy_ui", "encumbrance_ui", "depth_ui", "money_ui")]
 script = ExtResource("1_vm3kb")
 terrain_manager = NodePath("TerrainManager")
 player = NodePath("Player")
 safe_zone = NodePath("SafeZone")
-game_ui = NodePath("GameUI")
+energy_ui = NodePath("EnergyUI")
 encumbrance_ui = NodePath("EncumbranceUI")
 depth_ui = NodePath("DepthUI")
 money_ui = NodePath("MoneyUI")
@@ -66,7 +66,7 @@ position = Vector2(0, -32)
 [node name="GameCamera" parent="." unique_id=101017697 instance=ExtResource("7_camera")]
 zoom = Vector2(2, 2)
 
-[node name="GameUI" parent="." unique_id=547995439 instance=ExtResource("10_66x0g")]
+[node name="EnergyUI" parent="." instance=ExtResource("10_energy")]
 layer = 99
 
 [node name="SafeZone" parent="." unique_id=1549421324 instance=ExtResource("11_safezone")]

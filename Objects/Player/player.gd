@@ -1,9 +1,14 @@
 class_name Player
 extends CharacterBody2D
 
+# Define Movement Modes
+enum MovementMode {NORMAL, DIG, FLYING}
+
 # Signals
 signal item_collected(type: TileDefinition)
 signal inventory_full_rejected()
+signal energy_changed(current: float, max_val: float)
+signal energy_depleted
 
 # Components
 @onready var visual: ColorRect = $Visual
@@ -13,12 +18,18 @@ signal inventory_full_rejected()
 @onready var upgrades: UpgradeManager = $UpgradeManager
 
 # Exports
+@export_group("Modes")
+@export var current_mode: MovementMode = MovementMode.DIG
+
 @export_group("Base Stats")
 @export var base_speed: float = 150.0
 @export var base_dig_interval: float = 0.5
 @export var grid_size: int = 32
 @export var recoil_distance: float = 10.0
 @export var recoil_recovery_speed: float = 5.0
+@export var gravity: float = 1200.0
+@export var base_max_energy: float = 20.0
+@export var fly_energy_cost: float = 4.0 # Cost per second
 
 # State
 var _input_direction: Vector2 = Vector2.ZERO
@@ -30,21 +41,24 @@ var _recoil_offset: Vector2 = Vector2.ZERO
 var _dig_cooldown: float = 0.0
 var _debug_flash_timer: float = 0.0
 
+# Energy State
+var current_energy: float = 100.0
+
 func _ready() -> void:
 	add_to_group("player")
 	
-	# Connect signal to listen for upgrades
 	stats.stat_changed.connect(_on_stat_changed)
 	
 	# Initialize Stats
 	stats.initialize("move_speed", base_speed)
 	stats.initialize("dig_speed", base_dig_interval)
 	stats.initialize("dig_damage", 1.0)
-	
-	# Initialize Time Bonus (starts at 0)
 	stats.initialize("time_bonus", 0.0)
 	
-	# Initialize Weight from Inventory Component's default
+	# Initialize Energy
+	stats.initialize("max_energy", base_max_energy)
+	current_energy = stats.get_value("max_energy")
+	
 	if inventory:
 		stats.initialize("max_weight", inventory.max_weight)
 	
@@ -65,14 +79,19 @@ func _ready() -> void:
 	if inventory:
 		inventory.inventory_changed_value.connect(_on_inventory_weight_changed)
 		_on_inventory_weight_changed(inventory.current_weight, inventory.max_weight)
+	
+	call_deferred("_emit_energy_update")
+
+func _emit_energy_update() -> void:
+	energy_changed.emit(current_energy, stats.get_value("max_energy"))
 
 func _on_stat_changed(stat_name: String, new_value: float) -> void:
 	if stat_name == "max_weight" and inventory:
 		inventory.max_weight = new_value
-		# Force UI update
 		inventory.inventory_changed_value.emit(inventory.current_weight, inventory.max_weight)
-		# Re-check speed penalty logic
 		_on_inventory_weight_changed(inventory.current_weight, inventory.max_weight)
+	elif stat_name == "max_energy":
+		_emit_energy_update()
 
 func reset_all_stats() -> void:
 	if stats:
@@ -80,6 +99,8 @@ func reset_all_stats() -> void:
 	if upgrades:
 		upgrades.clear_upgrades()
 	_speed_multiplier = 1.0
+	current_energy = stats.get_value("max_energy")
+	_emit_energy_update()
 
 func _process(delta: float) -> void:
 	if _debug_flash_timer > 0:
@@ -99,15 +120,26 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	_handle_timers(delta)
 	_handle_input()
-	_handle_movement()
+	_handle_movement(delta)
 	_handle_actions()
+	
+	if current_mode == MovementMode.FLYING:
+		consume_energy(fly_energy_cost * delta)
+
+func consume_energy(amount: float) -> void:
+	if current_energy <= 0: return
+	
+	current_energy -= amount
+	if current_energy <= 0:
+		current_energy = 0
+		# Emit depleted signal immediately when hitting 0
+		energy_depleted.emit()
+	
+	energy_changed.emit(current_energy, stats.get_value("max_energy"))
 
 func _handle_timers(delta: float) -> void:
 	if _dig_cooldown > 0:
 		_dig_cooldown -= delta
-
-func _unhandled_input(_event: InputEvent) -> void:
-	pass
 
 func _handle_input() -> void:
 	var raw_input := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
@@ -120,18 +152,42 @@ func _handle_input() -> void:
 		_facing_direction = _input_direction.normalized()
 	else:
 		_input_direction = Vector2.ZERO
+	
+	# Hold Space to fly logic
+	if Input.is_key_pressed(KEY_SPACE) and current_energy > 0:
+		if current_mode != MovementMode.FLYING:
+			current_mode = MovementMode.FLYING
+			velocity.y = 0
+	else:
+		if current_mode == MovementMode.FLYING:
+			current_mode = MovementMode.DIG
 
-func _handle_movement() -> void:
+func _handle_movement(delta: float) -> void:
 	var current_speed = stats.get_value("move_speed")
-	velocity = _input_direction * current_speed * _speed_multiplier
+	
+	match current_mode:
+		MovementMode.FLYING:
+			velocity = _input_direction * current_speed * _speed_multiplier
+		MovementMode.NORMAL, MovementMode.DIG:
+			velocity.x = _input_direction.x * current_speed * _speed_multiplier
+			velocity.y += gravity * delta
+
 	move_and_slide()
 
 func _handle_actions() -> void:
+	if current_mode == MovementMode.NORMAL:
+		return
+		
 	if Input.is_key_pressed(KEY_Z):
 		if _dig_cooldown <= 0:
 			_try_manual_dig()
 
 func _try_manual_dig() -> void:
+	# UPDATED: Allow digging as long as we have ANY energy (>0), 
+	# even if it's less than 1.0 (fractional).
+	if current_energy <= 0:
+		return
+
 	var interval = stats.get_value("dig_speed")
 	interval = max(0.05, interval)
 	
@@ -143,8 +199,9 @@ func _try_manual_dig() -> void:
 	var damage_amount = int(stats.get_value("dig_damage"))
 	var status = _terrain_manager.try_dig(global_position, _facing_direction, damage_amount)
 
-	if status == TerrainManager.DigStatus.HIT:
+	if status == TerrainManager.DigStatus.HIT or status == TerrainManager.DigStatus.DESTROYED:
 		_recoil_offset = - _facing_direction * recoil_distance
+		consume_energy(1.0)
 
 func _draw() -> void:
 	if Globals.debug_mode:
@@ -154,7 +211,6 @@ func _draw() -> void:
 		if _debug_flash_timer > 0: color = Color.RED
 		draw_line(start, end, color, 4.0)
 
-# UPDATED: Accept specific value for depth scaling logic
 func collect_item(item_type: TileDefinition, value: int = -1) -> void:
 	if not inventory: return
 	var success = inventory.add_item(item_type, 1, value)

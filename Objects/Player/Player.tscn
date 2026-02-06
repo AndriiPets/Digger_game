@@ -1,41 +1,41 @@
-[gd_scene load_steps=7 format=3 uid="uid://q3gkxaqb0g24"]
+[gd_scene format=3 uid="uid://q3gkxaqb0g24"]
 
-[ext_resource type="Script" path="res://Objects/Player/player.gd" id="1_script"]
-[ext_resource type="Script" path="res://Objects/Components/Inventory/inventory_component.gd" id="2_oansn"]
-[ext_resource type="Script" path="res://Objects/Components/Stats/stats_component.gd" id="3_stats"]
-[ext_resource type="Script" path="res://Objects/Components/Upgrades/upgrade_manager.gd" id="4_upgrades"]
+[ext_resource type="Script" uid="uid://1teegydqhma8" path="res://Objects/Player/player.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://qfsa8oxar5a6" path="res://Objects/Components/Inventory/inventory_component.gd" id="2_oansn"]
+[ext_resource type="Script" uid="uid://bjt1xw1r0wdvy" path="res://Objects/Components/Stats/stats_component.gd" id="3_stats"]
+[ext_resource type="Script" uid="uid://sqidlgeqilni" path="res://Objects/Components/Upgrades/upgrade_manager.gd" id="4_upgrades"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(16, 16)
+size = Vector2(24, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dig"]
-size = Vector2(16, 16)
+size = Vector2(24, 24)
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" unique_id=475047481]
 script = ExtResource("1_script")
 
-[node name="Visual" type="ColorRect" parent="."]
+[node name="Visual" type="ColorRect" parent="." unique_id=1934812268]
 offset_left = -12.0
 offset_top = -12.0
 offset_right = 12.0
 offset_bottom = 12.0
 color = Color(0.2, 0.8, 0.2, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=619360698]
 shape = SubResource("RectangleShape2D_player")
 
-[node name="DigDetector" type="Area2D" parent="."]
+[node name="DigDetector" type="Area2D" parent="." unique_id=1160029519]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DigDetector"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DigDetector" unique_id=1739942352]
 shape = SubResource("RectangleShape2D_dig")
 debug_color = Color(0.9, 0.2, 0.2, 0.4)
 
-[node name="Inventory" type="Node" parent="."]
+[node name="Inventory" type="Node" parent="." unique_id=1964195654]
 unique_name_in_owner = true
 script = ExtResource("2_oansn")
 
-[node name="StatsComponent" type="Node" parent="."]
+[node name="StatsComponent" type="Node" parent="." unique_id=544419760]
 script = ExtResource("3_stats")
 
-[node name="UpgradeManager" type="Node" parent="."]
+[node name="UpgradeManager" type="Node" parent="." unique_id=400928977]
 script = ExtResource("4_upgrades")

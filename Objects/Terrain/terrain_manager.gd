@@ -4,10 +4,13 @@ extends Node2D
 signal block_broken(grid_pos: Vector2i, type: TileDefinition)
 
 enum DigStatus {NONE, HIT, DESTROYED}
+# NEW: Enum for generation modes
+enum GenerationMode {REGENERATE, PERSISTENT, PIT}
 
 # --- Configuration ---
 @export_category("Map Settings")
-@export var is_persistent: bool = true
+# NEW: Replaced is_persistent boolean with the enum
+@export var generation_mode: GenerationMode = GenerationMode.PERSISTENT
 @export var grid_size: int = 32
 @export var map_width: int = 25
 @export var map_height: int = 250
@@ -29,6 +32,10 @@ enum DigStatus {NONE, HIT, DESTROYED}
 const SOURCE_ID_TERRAIN: int = 0
 const SOURCE_ID_DAMAGE: int = 1
 
+const BASE_DEPTH_MULTIPLIER: float = 20.0
+const BASE_HP_MULTIPLIER: float = 1.15
+const BASE_VALUE_MULTIPLIER: float = 1.3
+
 @export var default_drop_scene: PackedScene
 @export var block_break_particles_scene: PackedScene
 
@@ -41,11 +48,6 @@ var _ore_data_map: Dictionary = {}
 
 var _cached_definitions: Array[TileDefinition] = []
 var _has_generated: bool = false
-
-#---Balance vars
-const BASE_DEPTH_MULTIPLIER: float = 20.0
-const BASE_HP_MULTIPLIER: float = 1.15
-const BASE_VALUE_MULTIPLIER: float = 1.3
 
 func _ready() -> void:
 	_base_layer.show_behind_parent = true
@@ -122,11 +124,12 @@ func _add_collision_to_tile(tile_data: TileData) -> void:
 # --- Generation Logic ---
 
 func regenerate_map() -> void:
-	# Persistence Check
-	if is_persistent and _has_generated:
+	# UPDATED: Check Enum instead of boolean
+	if generation_mode == GenerationMode.PERSISTENT and _has_generated:
 		print("TerrainManager: Persisting existing map.")
 		return
 
+	# Clear previous map (Happens for REGENERATE and PIT)
 	_base_layer.clear()
 	_ore_layer.clear()
 	_damage_layer.clear()
@@ -142,9 +145,16 @@ func regenerate_map() -> void:
 		for x in range(-half_w - 1, half_w + 2):
 			var coords = Vector2i(x, y)
 			
+			# Bedrock Borders and Floor logic
 			if x == -half_w - 1 or x == half_w + 1 or y == map_height:
 				_create_tile_at(coords, bedrock_definition, null)
 				continue
+			
+			# NEW: Pit Mode Logic
+			# If in Pit Mode, check if X is within the -3 to 3 gap (6 blocks wide: -3, -2, -1, 0, 1, 2)
+			if generation_mode == GenerationMode.PIT:
+				if x >= -3 and x < 3:
+					continue # Skip generating a block here
 			
 			if active_layer:
 				_generate_composite_tile(coords, active_layer)
@@ -161,11 +171,11 @@ func _generate_composite_tile(coords: Vector2i, layer: TerrainLayer) -> void:
 	var base_block: TileDefinition = _pick_weighted(layer.structural_pool)
 	if not base_block: return
 	
-	# NEW: Calculate Depth Scale (DS)
+	# Calculate Depth Scale (DS)
 	# Formula: DS = 1 + (depth / 50)
 	var depth_scale: float = 1.0 + (float(coords.y) / BASE_DEPTH_MULTIPLIER)
 	
-	# NEW: Scale Ore Spawn Chance
+	# Scale Ore Spawn Chance
 	# Formula: Chance = BaseChance * DS^0.25
 	var scaled_chance = global_resource_chance * pow(depth_scale, 0.25)
 	
@@ -207,7 +217,7 @@ func _create_tile_at(coords: Vector2i, base: TileDefinition, ore: TileDefinition
 		if ore:
 			total_hp += ore.health_bonus
 		
-		# NEW: Scale Block Health
+		# Scale Block Health
 		# Formula: HP = BaseHP * DS^1.15
 		var depth_scale: float = 1.0 + (float(coords.y) / BASE_DEPTH_MULTIPLIER)
 		var scaled_hp = float(total_hp) * pow(depth_scale, BASE_HP_MULTIPLIER)
@@ -231,7 +241,7 @@ func _destroy_tile(coords: Vector2i) -> void:
 		particles.global_position = world_pos
 		particles.setup(tile_texture_atlas, base_def.atlas_coords, grid_size)
 
-	# NEW: Scale Value for Drops
+	# Scale Value for Drops
 	# Formula: Value = BaseValue * DS^1.3
 	var depth_scale: float = 1.0 + (float(coords.y) / BASE_DEPTH_MULTIPLIER)
 	var value_multiplier: float = pow(depth_scale, BASE_VALUE_MULTIPLIER)

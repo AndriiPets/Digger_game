@@ -3,7 +3,6 @@ extends Node
 
 enum GameState {SAFE, RUN}
 
-@export var round_time: float = 60.0
 @export var player_start_pos: Vector2 = Vector2(0, -32)
 
 @export_group("References")
@@ -12,14 +11,13 @@ enum GameState {SAFE, RUN}
 @export var safe_zone: SafeZone
 
 @export_group("UI References")
-@export var game_ui: TimerUI
+@export var energy_ui: EnergyUI
 @export var encumbrance_ui: EncumbranceUI
 @export var depth_ui: DepthUI
 @export var money_ui: MoneyUI
 @export var floating_text_scene: PackedScene
 
 var total_money: int = 10
-var _current_time: float
 var _current_state: GameState = GameState.SAFE
 
 func _ready() -> void:
@@ -45,6 +43,12 @@ func _connect_gameplay_signals() -> void:
 			if not player.inventory.inventory_changed_value.is_connected(encumbrance_ui.update_display):
 				player.inventory.inventory_changed_value.connect(encumbrance_ui.update_display)
 				encumbrance_ui.update_display(player.inventory.current_weight, player.inventory.max_weight)
+		
+		if energy_ui and not player.energy_changed.is_connected(energy_ui.update_energy):
+			player.energy_changed.connect(energy_ui.update_energy)
+		
+		if not player.energy_depleted.is_connected(_on_energy_depleted):
+			player.energy_depleted.connect(_on_energy_depleted)
 	
 	var shops = get_tree().get_nodes_in_group("shops")
 	for shop in shops:
@@ -80,11 +84,6 @@ func _spawn_floating_text(text: String, color: Color) -> void:
 	popup.setup(text, player.global_position + random_offset, color)
 
 func _process(delta: float) -> void:
-	if _current_state == GameState.RUN and _current_time > 0:
-		_current_time -= delta
-		if game_ui: game_ui.update_timer(_current_time)
-		if _current_time <= 0: _end_round()
-
 	if depth_ui and player:
 		var grid_size = player.grid_size if "grid_size" in player else 32
 		var depth_meters = floor(player.global_position.y / float(grid_size))
@@ -101,13 +100,6 @@ func _on_player_entered_safezone() -> void:
 func _reset_game() -> void:
 	_current_state = GameState.SAFE
 	
-	# NEW: Calculate Time based on stats
-	var bonus_time = 0.0
-	if player and player.stats:
-		bonus_time = player.stats.get_value("time_bonus")
-	
-	_current_time = round_time + bonus_time
-	
 	if player:
 		player.velocity = Vector2.ZERO
 		player.global_position = player_start_pos
@@ -115,14 +107,15 @@ func _reset_game() -> void:
 		player.reset_all_stats()
 
 	if terrain_manager: terrain_manager.regenerate_map()
-	if game_ui:
-		game_ui.update_timer(_current_time)
-		game_ui.set_timer_visible(false)
 
 func start_run() -> void:
 	if _current_state == GameState.SAFE:
 		_current_state = GameState.RUN
-		if game_ui: game_ui.set_timer_visible(true)
+
+func _on_energy_depleted() -> void:
+	# UPDATED: Always trigger restart if energy depleted, regardless of state
+	_spawn_floating_text("Exhausted!", Color.RED)
+	_end_round()
 
 func _end_round() -> void:
 	_reset_game()
