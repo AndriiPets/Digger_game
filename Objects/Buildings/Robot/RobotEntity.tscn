@@ -1,0 +1,35 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Objects/Buildings/Robot/robot_entity.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cet7i4yupcg1y" path="res://icon.svg" id="2_visual"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_robot"]
+size = Vector2(32, 32)
+
+[node name="RobotEntity" type="Area2D"]
+collision_layer = 0
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_robot")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.4, 0.4, 0.5, 1)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("2_visual")
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -35.0
+offset_right = 20.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 10
+text = "MECH"
+horizontal_alignment = 1

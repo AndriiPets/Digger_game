@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ShopCategory" format=3 uid="uid://cbqoyky1so47q"]
+
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_0gl6v"]
+[ext_resource type="Resource" uid="uid://svh7ivrtfav6" path="res://Resources/Shop/harness_rusty.tres" id="2_ycitb"]
+[ext_resource type="Script" uid="uid://obltmqicuq7m" path="res://Resources/Shop/shop_category.gd" id="3_u6qjt"]
+
+[resource]
+script = ExtResource("3_u6qjt")
+id = "carryweight"
+display_name = "Carryweight"
+items = Array[ExtResource("1_0gl6v")]([ExtResource("2_ycitb")])

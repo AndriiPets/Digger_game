@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ShopCategory" format=3 uid="uid://dxt4o8k1mqjqc"]
+
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_tv0x0"]
+[ext_resource type="Resource" uid="uid://dlcibhyx266mc" path="res://Resources/Shop/clock_rusty.tres" id="2_0pptk"]
+[ext_resource type="Script" uid="uid://obltmqicuq7m" path="res://Resources/Shop/shop_category.gd" id="2_w7w37"]
+
+[resource]
+script = ExtResource("2_w7w37")
+id = "energy"
+display_name = "Fuel"
+items = Array[ExtResource("1_tv0x0")]([ExtResource("2_0pptk")])

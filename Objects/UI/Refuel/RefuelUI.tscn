@@ -1,0 +1,132 @@
+[gd_scene format=3 uid="uid://bmkdy4s7eqpa5"]
+
+[ext_resource type="Script" uid="uid://c48loqeh5acb" path="res://Objects/UI/Refuel/refuel_ui.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fuel"]
+bg_color = Color(0.1, 0.15, 0.1, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.6, 0.2, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="RefuelUI" type="CanvasLayer" unique_id=1360881474]
+layer = 100
+script = ExtResource("1_script")
+
+[node name="Control" type="Control" parent="." unique_id=1523920384]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=1901359679]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="Panel" type="Panel" parent="Control" unique_id=1869425384]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -100.0
+offset_right = 140.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fuel")
+
+[node name="TitleLabel" type="Label" parent="Control/Panel" unique_id=1586874892]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 20.0
+offset_bottom = 46.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 22
+text = "REFUELING STATION"
+horizontal_alignment = 1
+
+[node name="WalletLabel" type="Label" parent="Control/Panel" unique_id=2938420]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 50.0
+offset_bottom = 70.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+text = "Funds: $0"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Control/Panel" unique_id=1624718232]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 75.0
+offset_bottom = 79.0
+grow_horizontal = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel" unique_id=108010853]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -10.0
+offset_bottom = 70.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="StatusLabel" type="Label" parent="Control/Panel/VBoxContainer" unique_id=482910]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Fuel Level: 50 / 100"
+horizontal_alignment = 1
+
+[node name="CostLabel" type="Label" parent="Control/Panel/VBoxContainer" unique_id=582911]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Cost: $5"
+horizontal_alignment = 1
+
+[node name="ActionLabel" type="Label" parent="Control/Panel/VBoxContainer" unique_id=682912]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+text = "[Z] CONFIRM REFUEL"
+horizontal_alignment = 1
+
+[node name="HelpLabel" type="Label" parent="Control/Panel" unique_id=1405045423]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -25.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 10
+text = "[X] Cancel"
+horizontal_alignment = 1

@@ -19,17 +19,25 @@ signal energy_depleted
 
 # Exports
 @export_group("Modes")
-@export var current_mode: MovementMode = MovementMode.DIG
+# CHANGED: Default mode is now NORMAL
+@export var current_mode: MovementMode = MovementMode.NORMAL
 
 @export_group("Base Stats")
 @export var base_speed: float = 150.0
 @export var base_dig_interval: float = 0.5
 @export var grid_size: int = 32
-@export var recoil_distance: float = 10.0
+@export var recoil_distance: float = 5.0
 @export var recoil_recovery_speed: float = 5.0
 @export var gravity: float = 1200.0
 @export var base_max_energy: float = 20.0
-@export var fly_energy_cost: float = 4.0 # Cost per second
+@export var fly_energy_cost: float = 4.0
+
+# NEW: Screen Shake Settings
+@export_group("Effects")
+@export var shake_threshold_small: float = 300.0
+@export var shake_strength_small: float = 0.3
+@export var shake_threshold_large: float = 600.0
+@export var shake_strength_large: float = 1.0
 
 # State
 var _input_direction: Vector2 = Vector2.ZERO
@@ -40,6 +48,9 @@ var _base_visual_pos: Vector2
 var _recoil_offset: Vector2 = Vector2.ZERO
 var _dig_cooldown: float = 0.0
 var _debug_flash_timer: float = 0.0
+
+# NEW: Logic to track landing
+var _previous_velocity_y: float = 0.0
 
 # Energy State
 var current_energy: float = 100.0
@@ -102,6 +113,20 @@ func reset_all_stats() -> void:
 	current_energy = stats.get_value("max_energy")
 	_emit_energy_update()
 
+# --- NEW STATE MANAGEMENT FUNCTIONS ---
+func enter_mech() -> void:
+	current_mode = MovementMode.DIG
+	# Visual cue: Change color to indicate mech mode
+	visual.color = Color(0.3, 0.6, 0.9) # Light Blue
+	velocity = Vector2.ZERO
+
+func exit_mech() -> void:
+	current_mode = MovementMode.NORMAL
+	# Visual cue: Reset to human color
+	visual.color = Color(0.2, 0.8, 0.2) # Green
+	velocity = Vector2.ZERO
+# --------------------------------------
+
 func _process(delta: float) -> void:
 	if _debug_flash_timer > 0:
 		_debug_flash_timer -= delta
@@ -120,11 +145,30 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	_handle_timers(delta)
 	_handle_input()
+	
+	# NEW: Capture velocity before slide modifies it (to detect impact)
+	_previous_velocity_y = velocity.y
+	
 	_handle_movement(delta)
+	
+	# NEW: Check for landing
+	if is_on_floor() and _previous_velocity_y > 0.0:
+		_check_landing_impact()
+		
 	_handle_actions()
 	
 	if current_mode == MovementMode.FLYING:
 		consume_energy(fly_energy_cost * delta)
+
+# NEW: Calculate impact intensity and trigger shake
+func _check_landing_impact() -> void:
+	# Only shake screen if in Mech mode (Dig or Fly)
+	if current_mode == MovementMode.NORMAL: return
+
+	if _previous_velocity_y > shake_threshold_large:
+		VFXManager.screen_shake(shake_strength_large)
+	elif _previous_velocity_y > shake_threshold_small:
+		VFXManager.screen_shake(shake_strength_small)
 
 func consume_energy(amount: float) -> void:
 	if current_energy <= 0: return
@@ -132,7 +176,6 @@ func consume_energy(amount: float) -> void:
 	current_energy -= amount
 	if current_energy <= 0:
 		current_energy = 0
-		# Emit depleted signal immediately when hitting 0
 		energy_depleted.emit()
 	
 	energy_changed.emit(current_energy, stats.get_value("max_energy"))
@@ -142,7 +185,7 @@ func _handle_timers(delta: float) -> void:
 		_dig_cooldown -= delta
 
 func _handle_input() -> void:
-	var raw_input := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var raw_input := Input.get_vector("LEFT", "RIGHT", "UP", "DOWN")
 
 	if raw_input.x != 0:
 		_input_direction = Vector2(raw_input.x, 0)
@@ -155,7 +198,8 @@ func _handle_input() -> void:
 	
 	# Hold Space to fly logic
 	if Input.is_key_pressed(KEY_SPACE) and current_energy > 0:
-		if current_mode != MovementMode.FLYING:
+		# Can only fly if already in mech (DIG mode)
+		if current_mode == MovementMode.DIG:
 			current_mode = MovementMode.FLYING
 			velocity.y = 0
 	else:
@@ -167,7 +211,10 @@ func _handle_movement(delta: float) -> void:
 	
 	match current_mode:
 		MovementMode.FLYING:
-			velocity = _input_direction * current_speed * _speed_multiplier
+			velocity.x = _input_direction.x * current_speed * _speed_multiplier
+			# Constant upward movement
+			velocity.y = - current_speed * _speed_multiplier
+			
 		MovementMode.NORMAL, MovementMode.DIG:
 			velocity.x = _input_direction.x * current_speed * _speed_multiplier
 			velocity.y += gravity * delta
@@ -178,13 +225,11 @@ func _handle_actions() -> void:
 	if current_mode == MovementMode.NORMAL:
 		return
 		
-	if Input.is_key_pressed(KEY_Z):
+	if Input.is_action_pressed("ACTION"):
 		if _dig_cooldown <= 0:
 			_try_manual_dig()
 
 func _try_manual_dig() -> void:
-	# UPDATED: Allow digging as long as we have ANY energy (>0), 
-	# even if it's less than 1.0 (fractional).
 	if current_energy <= 0:
 		return
 

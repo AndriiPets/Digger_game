@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ShopCategory" format=3 uid="uid://rt6kppcswccu"]
+
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_ge7ow"]
+[ext_resource type="Resource" uid="uid://de2ula0cxarq8" path="res://Resources/Shop/drill_rusty.tres" id="2_wpql2"]
+[ext_resource type="Script" uid="uid://obltmqicuq7m" path="res://Resources/Shop/shop_category.gd" id="3_nk0co"]
+
+[resource]
+script = ExtResource("3_nk0co")
+id = "drills"
+display_name = "Drills"
+items = Array[ExtResource("1_ge7ow")]([ExtResource("2_wpql2")])

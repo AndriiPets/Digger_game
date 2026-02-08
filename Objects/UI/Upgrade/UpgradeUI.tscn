@@ -1,0 +1,188 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Objects/UI/Upgrade/upgrade_ui.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info"]
+bg_color = Color(0.1, 0.1, 0.1, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rebuild"]
+bg_color = Color(0.12, 0.12, 0.15, 0.95)
+border_width_top = 4
+border_color = Color(0.6, 0.6, 0.6, 1)
+
+[node name="UpgradeUI" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_script")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="MarginContainer" type="MarginContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 80
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="LeftColumn" type="VBoxContainer" parent="Control/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.2
+
+[node name="Label" type="Label" parent="Control/MarginContainer/HBoxContainer/LeftColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "UPGRADE CONSOLE"
+
+[node name="WalletLabel" type="Label" parent="Control/MarginContainer/HBoxContainer/LeftColumn" unique_id=1849203]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+text = "Funds: $0"
+
+[node name="HSeparator" type="HSeparator" parent="Control/MarginContainer/HBoxContainer/LeftColumn"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Control/MarginContainer/HBoxContainer/LeftColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CategoryContainer" type="VBoxContainer" parent="Control/MarginContainer/HBoxContainer/LeftColumn/ScrollContainer" unique_id=2938420]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="RightColumn" type="VBoxContainer" parent="Control/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InfoPanel" type="Panel" parent="Control/MarginContainer/HBoxContainer/RightColumn" unique_id=9382019]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_info")
+
+[node name="Margin" type="MarginContainer" parent="Control/MarginContainer/HBoxContainer/RightColumn/InfoPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Control/MarginContainer/HBoxContainer/RightColumn/InfoPanel/Margin"]
+layout_mode = 2
+
+[node name="InfoTitle" type="Label" parent="Control/MarginContainer/HBoxContainer/RightColumn/InfoPanel/Margin/VBox" unique_id=582910]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Item Name"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Control/MarginContainer/HBoxContainer/RightColumn/InfoPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="InfoDesc" type="Label" parent="Control/MarginContainer/HBoxContainer/RightColumn/InfoPanel/Margin/VBox" unique_id=203948]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "Description..."
+autowrap_mode = 2
+
+[node name="InfoCost" type="Label" parent="Control/MarginContainer/HBoxContainer/RightColumn/InfoPanel/Margin/VBox" unique_id=928340]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "$ 100"
+horizontal_alignment = 1
+
+[node name="HelpLabel" type="Label" parent="Control/MarginContainer/HBoxContainer/RightColumn"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+text = "[Arrows] Navigate   [Z] Select/Buy   [X] Back"
+horizontal_alignment = 2
+
+[node name="RebuildPanel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -70.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_rebuild")
+
+[node name="HBox" type="HBoxContainer" parent="Control/RebuildPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 50
+alignment = 1
+
+[node name="StatusLabel" type="Label" parent="Control/RebuildPanel/HBox" unique_id=298517263]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "STATUS: BROKEN"
+vertical_alignment = 1
+
+[node name="CostLabel" type="Label" parent="Control/RebuildPanel/HBox" unique_id=10293847]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "REBUILD COST: $500"
+vertical_alignment = 1
+
+[node name="ActionLabel" type="Label" parent="Control/RebuildPanel/HBox" unique_id=48291028]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+text = "[R] REBUILD CHASSIS"
+vertical_alignment = 1

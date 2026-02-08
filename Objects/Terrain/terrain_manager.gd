@@ -32,8 +32,8 @@ enum GenerationMode {REGENERATE, PERSISTENT, PIT}
 const SOURCE_ID_TERRAIN: int = 0
 const SOURCE_ID_DAMAGE: int = 1
 
-const BASE_DEPTH_MULTIPLIER: float = 20.0
-const BASE_HP_MULTIPLIER: float = 1.15
+const BASE_DEPTH_MULTIPLIER: float = 50.0
+const BASE_HP_MULTIPLIER: float = 1.08
 const BASE_VALUE_MULTIPLIER: float = 1.3
 
 @export var default_drop_scene: PackedScene

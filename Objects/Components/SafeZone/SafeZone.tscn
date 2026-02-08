@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cs0lsmn0n0hmv"]
 
 [ext_resource type="Script" uid="uid://byydk8ue08ghw" path="res://Objects/Components/SafeZone/safe_zone.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cet7i4yupcg1y" path="res://icon.svg" id="2_gf12r"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
 size = Vector2(159, 96)
@@ -14,3 +15,9 @@ script = ExtResource("1_script")
 position = Vector2(0.5, -65)
 shape = SubResource("RectangleShape2D_zone")
 debug_color = Color(0.3, 0.8, 0.3, 0.2)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=205716350]
+modulate = Color(0.5237199, 0.8577022, 0, 1)
+position = Vector2(7.6293945e-06, -65.50001)
+scale = Vector2(1.2343751, 0.75781244)
+texture = ExtResource("2_gf12r")

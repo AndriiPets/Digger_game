@@ -5,7 +5,6 @@ var _effect_scenes: Dictionary = {}
 
 # Paths to effect scenes
 const HIT_FLASH_PATH = "res://Objects/FX/HitFlash/HitFlash.tscn"
-# Add more effects here in the future, e.g. const SMOKE_PATH = "..."
 
 func _ready() -> void:
 	# Preload scenes to avoid stutter during gameplay
@@ -33,9 +32,17 @@ func spawn_effect_scene(key: String, position: Vector2, parent: Node = null) -> 
 
 # --- Specific Effect Helpers ---
 
-# Helper for the Tile Hit Flash
 func play_tile_hit_effect(global_pos: Vector2, atlas: Texture2D, coords: Vector2i, grid_size: int) -> void:
 	var effect = spawn_effect_scene("hit_flash", global_pos)
 	
 	if effect and effect.has_method("setup"):
 		effect.setup(atlas, coords, grid_size)
+
+# NEW: Screen Shake API
+func screen_shake(intensity: float) -> void:
+	var cameras = get_tree().get_nodes_in_group("game_camera")
+	if not cameras.is_empty():
+		# Assume single player, grab the first camera
+		var cam = cameras[0]
+		if cam.has_method("apply_shake"):
+			cam.apply_shake(intensity)
