@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://dav16o3ay23fm"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_u1f36"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_2ms6v"]
+[ext_resource type="Script" uid="uid://d1edyhwfdcpus" path="res://Resources/Upgrades/Effects/time_upgrade.gd" id="2_f1rsy"]
+
+[sub_resource type="Resource" id="Resource_cophj"]
+script = ExtResource("2_f1rsy")
+amount = 75.0
+metadata/_custom_type_script = "uid://d1edyhwfdcpus"
+
+[resource]
+script = ExtResource("2_2ms6v")
+id = "advanced_battery"
+display_name = "Advanced battery"
+description = "State of the art battery, high energy capacity"
+effects = Array[ExtResource("1_u1f36")]([SubResource("Resource_cophj")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

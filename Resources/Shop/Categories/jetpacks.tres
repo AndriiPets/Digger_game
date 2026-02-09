@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ShopCategory" format=3 uid="uid://b61yb5mea0oib"]
+
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_usqgi"]
+[ext_resource type="Script" uid="uid://obltmqicuq7m" path="res://Resources/Shop/shop_category.gd" id="2_eeews"]
+[ext_resource type="Resource" uid="uid://b0qg4l5olniwb" path="res://Resources/Shop/basic_thruster.tres" id="2_h6up1"]
+[ext_resource type="Resource" uid="uid://b0djesaem3mqh" path="res://Resources/Shop/standart_thruster.tres" id="3_h6up1"]
+[ext_resource type="Resource" uid="uid://dlyl8p4lihdt0" path="res://Resources/Shop/reiforced_thruster.tres" id="4_xva73"]
+[ext_resource type="Resource" uid="uid://iwu7vo8qyudp" path="res://Resources/Shop/advanced_thruster.tres" id="5_qbukb"]
+
+[resource]
+script = ExtResource("2_eeews")
+id = "jetpacks"
+display_name = "Jetpacks"
+items = Array[ExtResource("1_usqgi")]([ExtResource("2_h6up1"), ExtResource("3_h6up1"), ExtResource("4_xva73"), ExtResource("5_qbukb")])
+metadata/_custom_type_script = "uid://obltmqicuq7m"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://iwu7vo8qyudp"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_om1ud"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_htw01"]
+[ext_resource type="Script" uid="uid://bpcbklcx52kai" path="res://Resources/Upgrades/Effects/fly_speed.gd" id="2_l3g5i"]
+
+[sub_resource type="Resource" id="Resource_sycfi"]
+script = ExtResource("2_l3g5i")
+amount = 40.0
+metadata/_custom_type_script = "uid://bpcbklcx52kai"
+
+[resource]
+script = ExtResource("2_htw01")
+id = "advanced_jetpack"
+display_name = "Advanced jetpack"
+description = "State of the art jetpack system, high-powered"
+cost = 80
+effects = Array[ExtResource("1_om1ud")]([SubResource("Resource_sycfi")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

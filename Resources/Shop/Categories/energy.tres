@@ -3,9 +3,12 @@
 [ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_tv0x0"]
 [ext_resource type="Resource" uid="uid://dlcibhyx266mc" path="res://Resources/Shop/clock_rusty.tres" id="2_0pptk"]
 [ext_resource type="Script" uid="uid://obltmqicuq7m" path="res://Resources/Shop/shop_category.gd" id="2_w7w37"]
+[ext_resource type="Resource" uid="uid://k2qi0ymwyd65" path="res://Resources/Shop/standart_battery.tres" id="3_0pptk"]
+[ext_resource type="Resource" uid="uid://70wm2hox3mm6" path="res://Resources/Shop/reinforced_battery.tres" id="4_8llwx"]
+[ext_resource type="Resource" uid="uid://dav16o3ay23fm" path="res://Resources/Shop/advanced_battery.tres" id="5_jwpek"]
 
 [resource]
 script = ExtResource("2_w7w37")
 id = "energy"
 display_name = "Fuel"
-items = Array[ExtResource("1_tv0x0")]([ExtResource("2_0pptk")])
+items = Array[ExtResource("1_tv0x0")]([ExtResource("2_0pptk"), ExtResource("3_0pptk"), ExtResource("4_8llwx"), ExtResource("5_jwpek")])

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://b0qg4l5olniwb"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_y7da7"]
+[ext_resource type="Script" uid="uid://bpcbklcx52kai" path="res://Resources/Upgrades/Effects/fly_speed.gd" id="2_i5s34"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_unjq8"]
+
+[sub_resource type="Resource" id="Resource_a15jr"]
+script = ExtResource("2_i5s34")
+amount = 0.0
+metadata/_custom_type_script = "uid://bpcbklcx52kai"
+
+[resource]
+script = ExtResource("2_unjq8")
+id = "basic_thruster"
+display_name = "Rusty jetpack"
+description = "Outdated jetpack system, very low-powered"
+cost = 0
+effects = Array[ExtResource("1_y7da7")]([SubResource("Resource_a15jr")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

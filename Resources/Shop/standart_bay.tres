@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://i6kabvre5kq1"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_1hh68"]
+[ext_resource type="Script" uid="uid://dsdixutlqso60" path="res://Resources/Upgrades/Effects/weight_upgrade.gd" id="2_iksca"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_k3kf0"]
+
+[sub_resource type="Resource" id="Resource_20g80"]
+script = ExtResource("2_iksca")
+metadata/_custom_type_script = "uid://dsdixutlqso60"
+
+[resource]
+script = ExtResource("2_k3kf0")
+id = "stanrart_bay"
+display_name = "Standart cargo bay"
+description = "Standart issue cargo bay, low weight limit"
+cost = 20
+effects = Array[ExtResource("1_1hh68")]([SubResource("Resource_20g80")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

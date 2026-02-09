@@ -18,7 +18,8 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if _in_range and not ui.visible:
-		if Input.is_action_just_pressed("ACTION"): # Z key
+		if Input.is_action_just_pressed("ACTION"):
+			SoundManager.play_sfx("select")
 			_open_interface()
 
 func _open_interface() -> void:

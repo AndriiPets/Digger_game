@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://clp2kabln45b2"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_hudwp"]
+[ext_resource type="Script" uid="uid://cft83d2y48kr2" path="res://Resources/Upgrades/Effects/drill_damage_up.gd" id="2_0rn1c"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_mq8f4"]
+
+[sub_resource type="Resource" id="Resource_yd7w2"]
+script = ExtResource("2_0rn1c")
+extra_damage = 9
+metadata/_custom_type_script = "uid://cft83d2y48kr2"
+
+[resource]
+script = ExtResource("2_mq8f4")
+id = "advanced_drill"
+display_name = "Advanced drill"
+description = "State of the art mining drill, high damage"
+cost = 80
+effects = Array[ExtResource("1_hudwp")]([SubResource("Resource_yd7w2")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

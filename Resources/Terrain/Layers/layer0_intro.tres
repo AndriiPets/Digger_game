@@ -2,23 +2,25 @@
 
 [ext_resource type="Script" uid="uid://dof72ljbcth16" path="res://Resources/Terrain/System/spawn_weight.gd" id="1_djvaa"]
 [ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="2_dxwwi"]
+[ext_resource type="Resource" uid="uid://nlbr56dseiay" path="res://Resources/Terrain/OreCoal.tres" id="2_j10uq"]
 [ext_resource type="Resource" uid="uid://c8ll4qgcbpunf" path="res://Resources/Terrain/Dirt.tres" id="3_j10uq"]
-[ext_resource type="Resource" uid="uid://d2oeyrjyfxhdp" path="res://Resources/Terrain/Stone.tres" id="4_5ggot"]
+
+[sub_resource type="Resource" id="Resource_5ggot"]
+script = ExtResource("1_djvaa")
+block = ExtResource("2_j10uq")
+weight = 1.0
+metadata/_custom_type_script = "uid://dof72ljbcth16"
 
 [sub_resource type="Resource" id="Resource_ufwx2"]
 script = ExtResource("1_djvaa")
 block = ExtResource("3_j10uq")
-weight = 90.0
-metadata/_custom_type_script = "uid://dof72ljbcth16"
-
-[sub_resource type="Resource" id="Resource_c56gs"]
-script = ExtResource("1_djvaa")
-block = ExtResource("4_5ggot")
+weight = 100.0
 metadata/_custom_type_script = "uid://dof72ljbcth16"
 
 [resource]
 script = ExtResource("2_dxwwi")
 layer_name = "Intro"
-max_depth = 5
-structural_pool = Array[ExtResource("1_djvaa")]([SubResource("Resource_ufwx2"), SubResource("Resource_c56gs")])
+max_depth = 10
+structural_pool = Array[ExtResource("1_djvaa")]([SubResource("Resource_ufwx2")])
+resource_pool = Array[ExtResource("1_djvaa")]([SubResource("Resource_5ggot")])
 metadata/_custom_type_script = "uid://dl2u22xdxd8yj"

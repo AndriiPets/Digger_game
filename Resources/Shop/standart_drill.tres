@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://bexhnbn8pu0ig"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_r3wy8"]
+[ext_resource type="Script" uid="uid://cft83d2y48kr2" path="res://Resources/Upgrades/Effects/drill_damage_up.gd" id="2_amc8j"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="3_y1wjt"]
+
+[sub_resource type="Resource" id="Resource_woxpx"]
+script = ExtResource("2_amc8j")
+extra_damage = 2
+metadata/_custom_type_script = "uid://cft83d2y48kr2"
+
+[resource]
+script = ExtResource("3_y1wjt")
+id = "standart_drill"
+display_name = "Standart drill"
+description = "Standart issue mining drill, low damage"
+cost = 20
+effects = Array[ExtResource("1_r3wy8")]([SubResource("Resource_woxpx")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

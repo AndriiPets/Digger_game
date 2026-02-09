@@ -3,9 +3,12 @@
 [ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_ge7ow"]
 [ext_resource type="Resource" uid="uid://de2ula0cxarq8" path="res://Resources/Shop/drill_rusty.tres" id="2_wpql2"]
 [ext_resource type="Script" uid="uid://obltmqicuq7m" path="res://Resources/Shop/shop_category.gd" id="3_nk0co"]
+[ext_resource type="Resource" uid="uid://bexhnbn8pu0ig" path="res://Resources/Shop/standart_drill.tres" id="3_wpql2"]
+[ext_resource type="Resource" uid="uid://bjq66g64k41ht" path="res://Resources/Shop/reinforced_drill.tres" id="4_nk0co"]
+[ext_resource type="Resource" uid="uid://clp2kabln45b2" path="res://Resources/Shop/advanced_drill.tres" id="5_b33tr"]
 
 [resource]
 script = ExtResource("3_nk0co")
 id = "drills"
 display_name = "Drills"
-items = Array[ExtResource("1_ge7ow")]([ExtResource("2_wpql2")])
+items = Array[ExtResource("1_ge7ow")]([ExtResource("2_wpql2"), ExtResource("3_wpql2"), ExtResource("4_nk0co"), ExtResource("5_b33tr")])

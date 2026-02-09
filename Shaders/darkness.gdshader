@@ -1,4 +1,3 @@
-
 shader_type canvas_item;
 
 // Uniforms updated by GDScript
@@ -31,5 +30,6 @@ void fragment() {
 		// Else remains 1.0 (Darkness)
 	}
 	
-	COLOR = vec4(0.0, 0.0, 0.0, alpha);
+	// FIX: Multiply by COLOR.a so the script's 'modulate.a' affects the transparency
+	COLOR = vec4(0.0, 0.0, 0.0, alpha * COLOR.a);
 }

@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://7ey75n33xsbr" path="res://Objects/Managers/game_manager.gd" id="1_vm3kb"]
 [ext_resource type="Texture2D" uid="uid://dav33anr6f6wx" path="res://Assets/Images/terrain_tileset.png" id="2_635xr"]
 [ext_resource type="PackedScene" uid="uid://q3gkxaqb0g24" path="res://Objects/Player/Player.tscn" id="2_player"]
-[ext_resource type="PackedScene" uid="uid://dgjvn67uxdwkm" path="res://Objects/UI/FloatingText/FloatingText.tscn" id="2_qk1kx"]
+[ext_resource type="PackedScene" path="res://Objects/UI/FloatingText/FloatingText.tscn" id="2_qk1kx"]
 [ext_resource type="Script" uid="uid://dl2u22xdxd8yj" path="res://Resources/Terrain/System/terrain_layer.gd" id="4_66x0g"]
 [ext_resource type="Resource" uid="uid://chhdbv5j5q3a" path="res://Resources/Terrain/Layers/layer1_surface.tres" id="5_dk750"]
 [ext_resource type="Texture2D" uid="uid://bkphjo15n4tpy" path="res://Assets/Images/cracks.png" id="5_wo0q1"]
@@ -12,22 +12,25 @@
 [ext_resource type="Resource" uid="uid://d0o3ug2hlrf3h" path="res://Resources/Terrain/Layers/layer0_intro.tres" id="6_bs1rv"]
 [ext_resource type="Resource" uid="uid://dj1j6aoux5pna" path="res://Resources/Terrain/Layers/layer2_shelf.tres" id="6_y8ukn"]
 [ext_resource type="Resource" uid="uid://biumhcgtb2qsp" path="res://Resources/Terrain/Layers/layer3_depths.tres" id="7_72xxr"]
-[ext_resource type="PackedScene" uid="uid://dthmkjnj2uodq" path="res://Objects/Camera/GameCamera.tscn" id="7_camera"]
-[ext_resource type="PackedScene" uid="uid://gno0t7q04vvb" path="res://Objects/Components/Drop/Drop.tscn" id="9_72xxr"]
-[ext_resource type="PackedScene" uid="uid://bjtuaioqraahg" path="res://Objects/UI/Energy/EnergyUI.tscn" id="10_energy"]
+[ext_resource type="PackedScene" path="res://Objects/Camera/GameCamera.tscn" id="7_camera"]
+[ext_resource type="PackedScene" path="res://Objects/Components/Drop/Drop.tscn" id="9_72xxr"]
+[ext_resource type="PackedScene" path="res://Objects/UI/Energy/EnergyUI.tscn" id="10_energy"]
 [ext_resource type="PackedScene" uid="uid://cs0lsmn0n0hmv" path="res://Objects/Components/SafeZone/SafeZone.tscn" id="11_safezone"]
 [ext_resource type="Script" uid="uid://qfsa8oxar5a6" path="res://Objects/Components/Inventory/inventory_component.gd" id="14_j3c8t"]
+[ext_resource type="PackedScene" path="res://Objects/FX/Background/BackgroudManager.tscn" id="16_bg_mgr"]
 [ext_resource type="PackedScene" path="res://Objects/UI/Encumbrance/EncumbranceUI.tscn" id="16_nxyhc"]
 [ext_resource type="PackedScene" path="res://Objects/FX/DarknessOverlay/DarknessOverlay.tscn" id="17_darkness"]
 [ext_resource type="PackedScene" path="res://Objects/UI/Depth/DepthUI.tscn" id="18_depth"]
 [ext_resource type="PackedScene" path="res://Objects/UI/Money/MoneyUI.tscn" id="20_kjb2r"]
+[ext_resource type="PackedScene" path="res://Objects/UI/Death/DeathUI.tscn" id="21_death_ui"]
 [ext_resource type="Script" uid="uid://obltmqicuq7m" path="res://Resources/Shop/shop_category.gd" id="24_mqddd"]
 [ext_resource type="PackedScene" path="res://Objects/Buildings/UpgradeConsole/UpgradeConsole.tscn" id="25_console"]
-[ext_resource type="PackedScene" path="res://Objects/Buildings/Robot/RobotEntity.tscn" id="26_robot"]
+[ext_resource type="PackedScene" uid="uid://cvpbwl5hhpa7e" path="res://Objects/Buildings/Robot/RobotEntity.tscn" id="26_robot"]
 [ext_resource type="Resource" uid="uid://rt6kppcswccu" path="res://Resources/Shop/Categories/drills.tres" id="27_cat1"]
-[ext_resource type="PackedScene" uid="uid://nlm7u7a1m0bw" path="res://Objects/Buildings/RefuelStation/RefuelingStation.tscn" id="28_c414l"]
+[ext_resource type="PackedScene" path="res://Objects/Buildings/RefuelStation/RefuelingStation.tscn" id="28_c414l"]
 [ext_resource type="Resource" uid="uid://cbqoyky1so47q" path="res://Resources/Shop/Categories/carryweight.tres" id="28_cat2"]
 [ext_resource type="Resource" uid="uid://dxt4o8k1mqjqc" path="res://Resources/Shop/Categories/energy.tres" id="29_cat3"]
+[ext_resource type="Resource" uid="uid://b61yb5mea0oib" path="res://Resources/Shop/Categories/jetpacks.tres" id="29_gujet"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_manual"]
 texture = ExtResource("2_635xr")
@@ -51,6 +54,9 @@ encumbrance_ui = NodePath("EncumbranceUI")
 depth_ui = NodePath("DepthUI")
 money_ui = NodePath("MoneyUI")
 floating_text_scene = ExtResource("2_qk1kx")
+death_ui_scene = ExtResource("21_death_ui")
+
+[node name="BackgroundManager" parent="." unique_id=1870775226 instance=ExtResource("16_bg_mgr")]
 
 [node name="TerrainManager" parent="." unique_id=1871782656 instance=ExtResource("1_terrain")]
 tile_texture_atlas = ExtResource("2_635xr")
@@ -60,11 +66,11 @@ bedrock_definition = ExtResource("6_bedrock")
 default_drop_scene = ExtResource("9_72xxr")
 
 [node name="StaticTerrain" type="TileMapLayer" parent="." unique_id=578961874]
-tile_map_data = PackedByteArray("AAD8/wAAAAAAAAAAAAD9/wAAAAAAAAAAAAD+/wAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAD7/wAAAAAAAAAAAAD6/wAAAAAAAAAAAAD5/wAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAD4/wAAAAAAAAAAAAD3/wAAAAAAAAAAAAD2/wAAAAAAAAAAAAD1/wAAAAAAAAAAAAD0/wAAAAAAAAAAAAAJAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAALAAAAAAAAAAAAAAAMAAAAAAAAAAAAAADz/wAAAAAAAAAAAAANAAAAAAAAAAAAAAD//wAAAAAAAAAAAADz////AAAAAAAAAADz//7/AAAAAAAAAADz//3/AAAAAAAAAADz//z/AAAAAAAAAADz//v/AAAAAAAAAAALAP//AAAAAAAAAAALAP7/AAAAAAAAAAALAP3/AAAAAAAAAAALAPz/AAAAAAAAAAALAPv/AAAAAAAAAAALAPr/AAAAAAAAAADz//r/AAAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAD2/wAAAAAAAAAAAAD1/wAAAAAAAAAAAAD0/wAAAAAAAAAAAAALAAAAAAAAAAAAAAAMAAAAAAAAAAAAAADz/wAAAAAAAAAAAAANAAAAAAAAAAAAAADz////AAAAAAAAAADz//7/AAAAAAAAAADz//3/AAAAAAAAAADz//z/AAAAAAAAAADz//v/AAAAAAAAAAALAP//AAAAAAAAAAALAP7/AAAAAAAAAAALAP3/AAAAAAAAAAALAPz/AAAAAAAAAAALAPv/AAAAAAAAAAALAPr/AAAAAAAAAADz//r/AAAAAAAAAAAJAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAD3/wAAAAAAAAAAAAD4/wAAAAAAAAAAAAD5/wAAAAAAAAAAAAD6/wAAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_manual")
 
 [node name="RobotEntity" parent="." unique_id=1427466002 instance=ExtResource("26_robot")]
-position = Vector2(-50, -16)
+position = Vector2(-208, -16)
 
 [node name="Player" parent="." unique_id=860141292 instance=ExtResource("2_player")]
 position = Vector2(0, -32)
@@ -76,7 +82,7 @@ zoom = Vector2(2, 2)
 layer = 99
 
 [node name="SafeZone" parent="." unique_id=1549421324 instance=ExtResource("11_safezone")]
-position = Vector2(189, 18)
+position = Vector2(271, 17)
 
 [node name="StashInventory" type="Node" parent="." unique_id=761450183]
 unique_name_in_owner = true
@@ -94,8 +100,8 @@ layer = 99
 [node name="MoneyUI" parent="." unique_id=719156879 instance=ExtResource("20_kjb2r")]
 
 [node name="UpgradeConsole" parent="." unique_id=1024877091 instance=ExtResource("25_console")]
-position = Vector2(-327, -25)
-categories = Array[ExtResource("24_mqddd")]([ExtResource("27_cat1"), ExtResource("28_cat2"), ExtResource("29_cat3")])
+position = Vector2(-350, -24)
+categories = Array[ExtResource("24_mqddd")]([ExtResource("27_cat1"), ExtResource("28_cat2"), ExtResource("29_cat3"), ExtResource("29_gujet")])
 
 [node name="RefuelingStation" parent="." unique_id=1653988094 instance=ExtResource("28_c414l")]
-position = Vector2(73, -25)
+position = Vector2(152, -23)

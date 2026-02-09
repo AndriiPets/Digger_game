@@ -1,24 +1,28 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://cvpbwl5hhpa7e"]
 
-[ext_resource type="Script" path="res://Objects/Buildings/Robot/robot_entity.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://cet7i4yupcg1y" path="res://icon.svg" id="2_visual"]
+[ext_resource type="Script" uid="uid://grf1csn8eyj1" path="res://Objects/Buildings/Robot/robot_entity.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c8s7pkfmf2mxj" path="res://Assets/Images/characters.png" id="2_uhuyd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_robot"]
 size = Vector2(32, 32)
 
-[node name="RobotEntity" type="Area2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(32, 33)
+
+[node name="RobotEntity" type="Area2D" unique_id=1655079472]
 collision_layer = 0
 script = ExtResource("1_script")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1873234823]
 shape = SubResource("RectangleShape2D_robot")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=755536970]
 modulate = Color(0.4, 0.4, 0.5, 1)
-scale = Vector2(0.25, 0.25)
-texture = ExtResource("2_visual")
+texture = ExtResource("2_uhuyd")
+hframes = 8
+vframes = 3
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=436912137]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -33,3 +37,12 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 10
 text = "MECH"
 horizontal_alignment = 1
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=622234803]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=446754428]
+position = Vector2(0, 0.5)
+shape = SubResource("RectangleShape2D_wall")
+disabled = true
+debug_color = Color(0.7, 0.1, 0.1, 0.42)

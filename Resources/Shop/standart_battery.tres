@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://k2qi0ymwyd65"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_nugpw"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_2kl00"]
+[ext_resource type="Script" uid="uid://d1edyhwfdcpus" path="res://Resources/Upgrades/Effects/time_upgrade.gd" id="2_mc6dl"]
+
+[sub_resource type="Resource" id="Resource_apmjs"]
+script = ExtResource("2_mc6dl")
+amount = 25.0
+metadata/_custom_type_script = "uid://d1edyhwfdcpus"
+
+[resource]
+script = ExtResource("2_2kl00")
+id = "standart_battery"
+display_name = "Standart battery"
+description = "Standart issue battery, low energy capacity"
+cost = 30
+effects = Array[ExtResource("1_nugpw")]([SubResource("Resource_apmjs")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

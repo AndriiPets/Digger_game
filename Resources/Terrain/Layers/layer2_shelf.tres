@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://b7dpktnttpvb2" path="res://Resources/Terrain/OreIron.tres" id="4_3nf5d"]
 [ext_resource type="Resource" uid="uid://d2oeyrjyfxhdp" path="res://Resources/Terrain/Stone.tres" id="5_abq2l"]
 [ext_resource type="Resource" uid="uid://dtvba11yvvxtj" path="res://Resources/Terrain/Basalt.tres" id="6_3nf5d"]
+[ext_resource type="Resource" uid="uid://c8ll4qgcbpunf" path="res://Resources/Terrain/Dirt.tres" id="8_abq2l"]
 
 [sub_resource type="Resource" id="Resource_l52a6"]
 script = ExtResource("1_xnygr")
@@ -28,19 +29,24 @@ metadata/_custom_type_script = "uid://dof72ljbcth16"
 [sub_resource type="Resource" id="Resource_3ghvc"]
 script = ExtResource("1_xnygr")
 block = ExtResource("5_abq2l")
-weight = 70.0
+weight = 20.0
 metadata/_custom_type_script = "uid://dof72ljbcth16"
 
 [sub_resource type="Resource" id="Resource_i4rru"]
 script = ExtResource("1_xnygr")
 block = ExtResource("6_3nf5d")
-weight = 30.0
+metadata/_custom_type_script = "uid://dof72ljbcth16"
+
+[sub_resource type="Resource" id="Resource_3nf5d"]
+script = ExtResource("1_xnygr")
+block = ExtResource("8_abq2l")
+weight = 70.0
 metadata/_custom_type_script = "uid://dof72ljbcth16"
 
 [resource]
 script = ExtResource("2_hj3fm")
 layer_name = "Shelf"
 max_depth = 90
-structural_pool = Array[ExtResource("1_xnygr")]([SubResource("Resource_3ghvc"), SubResource("Resource_i4rru")])
+structural_pool = Array[ExtResource("1_xnygr")]([SubResource("Resource_3ghvc"), SubResource("Resource_i4rru"), SubResource("Resource_3nf5d")])
 resource_pool = Array[ExtResource("1_xnygr")]([SubResource("Resource_l52a6"), SubResource("Resource_kvfn2"), SubResource("Resource_c1wyn")])
 metadata/_custom_type_script = "uid://dl2u22xdxd8yj"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3 uid="uid://csjmlhuv8ckkd"]
+
+[ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_4x4fd"]
+[ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="2_ehonq"]
+[ext_resource type="Script" uid="uid://dsdixutlqso60" path="res://Resources/Upgrades/Effects/weight_upgrade.gd" id="2_w087n"]
+
+[sub_resource type="Resource" id="Resource_2qif2"]
+script = ExtResource("2_w087n")
+amount = 10.0
+metadata/_custom_type_script = "uid://dsdixutlqso60"
+
+[resource]
+script = ExtResource("2_ehonq")
+id = "reiforced_bay"
+display_name = "Reiforced cargo bay"
+description = "Customized cargo bay, mid weight limit"
+cost = 40
+effects = Array[ExtResource("1_4x4fd")]([SubResource("Resource_2qif2")])
+metadata/_custom_type_script = "uid://dc23wylxy44r7"

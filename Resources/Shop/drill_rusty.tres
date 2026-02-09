@@ -3,18 +3,12 @@
 [ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_0ljpv"]
 [ext_resource type="Script" uid="uid://bul21xr1rktb2" path="res://Resources/Upgrades/upgrade_effect.gd" id="1_3xncf"]
 [ext_resource type="Texture2D" uid="uid://cet7i4yupcg1y" path="res://icon.svg" id="1_tsah5"]
-[ext_resource type="Script" uid="uid://cft83d2y48kr2" path="res://Resources/Upgrades/Effects/drill_damage_up.gd" id="2_wlhea"]
-
-[sub_resource type="Resource" id="Resource_nkxf1"]
-script = ExtResource("2_wlhea")
-metadata/_custom_type_script = "uid://cft83d2y48kr2"
 
 [resource]
 script = ExtResource("1_0ljpv")
 id = "Rusty_Drill"
 display_name = "Rusty Drill"
-description = "Increase drill dmage"
-cost = 10
+description = "Rusty drill, very low damage"
+cost = 0
 icon = ExtResource("1_tsah5")
-effects = Array[ExtResource("1_3xncf")]([SubResource("Resource_nkxf1")])
 metadata/_custom_type_script = "uid://dc23wylxy44r7"

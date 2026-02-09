@@ -138,15 +138,18 @@ func regenerate_map() -> void:
 	_ore_data_map.clear()
 	
 	var half_w: int = int(float(map_width) / 2.0)
+	var border_thickness: int = 10
 	
 	for y in range(1, map_height + 1):
 		var active_layer = _get_layer_for_depth(y)
 		
-		for x in range(-half_w - 1, half_w + 2):
+		# UPDATED: Loop range extended by border_thickness on both sides
+		for x in range(-half_w - 1 - border_thickness, half_w + 2 + border_thickness):
 			var coords = Vector2i(x, y)
 			
 			# Bedrock Borders and Floor logic
-			if x == -half_w - 1 or x == half_w + 1 or y == map_height:
+			# UPDATED: Condition checks if x is outside the playable area (<= -half_w - 1 or >= half_w + 1)
+			if x <= -half_w - 1 or x >= half_w + 1 or y == map_height:
 				_create_tile_at(coords, bedrock_definition, null)
 				continue
 			

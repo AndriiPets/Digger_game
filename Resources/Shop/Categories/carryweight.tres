@@ -3,9 +3,12 @@
 [ext_resource type="Script" uid="uid://dc23wylxy44r7" path="res://Resources/Shop/shop_item.gd" id="1_0gl6v"]
 [ext_resource type="Resource" uid="uid://svh7ivrtfav6" path="res://Resources/Shop/harness_rusty.tres" id="2_ycitb"]
 [ext_resource type="Script" uid="uid://obltmqicuq7m" path="res://Resources/Shop/shop_category.gd" id="3_u6qjt"]
+[ext_resource type="Resource" uid="uid://i6kabvre5kq1" path="res://Resources/Shop/standart_bay.tres" id="3_ycitb"]
+[ext_resource type="Resource" uid="uid://csjmlhuv8ckkd" path="res://Resources/Shop/reiforced_bay.tres" id="4_u6qjt"]
+[ext_resource type="Resource" uid="uid://dcgj6rebrbp4v" path="res://Resources/Shop/advanced_bay.tres" id="5_obs72"]
 
 [resource]
 script = ExtResource("3_u6qjt")
 id = "carryweight"
 display_name = "Carryweight"
-items = Array[ExtResource("1_0gl6v")]([ExtResource("2_ycitb")])
+items = Array[ExtResource("1_0gl6v")]([ExtResource("2_ycitb"), ExtResource("3_ycitb"), ExtResource("4_u6qjt"), ExtResource("5_obs72")])

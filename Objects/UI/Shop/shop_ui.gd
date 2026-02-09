@@ -10,7 +10,7 @@ signal item_purchased(item: ShopItem)
 @onready var cost_label: Label = $Control/Panel/CostLabel
 
 var _items: Array[ShopItem] = []
-var _owned_ids: Array[String] = [] # NEW: Tracks owned items
+var _owned_ids: Array[String] = []
 var _current_index: int = 0
 var _is_active: bool = false
 var _columns: int = 3
@@ -40,15 +40,12 @@ func _setup_styles() -> void:
 	style_selected.border_width_bottom = 4
 	style_selected.border_color = Color.WHITE
 
-# --- Public API ---
-
-# UPDATED: Now accepts owned_ids
 func populate_and_open(shop_name: String, items_for_sale: Array[ShopItem], current_money: int, owned_ids: Array[String]) -> void:
 	title_label.text = shop_name.to_upper()
 	_items = items_for_sale
 	_current_index = 0
 	_current_wallet = current_money
-	_owned_ids = owned_ids # Store ownership data
+	_owned_ids = owned_ids
 	
 	_rebuild_grid()
 	
@@ -64,8 +61,6 @@ func close() -> void:
 	visible = false
 	get_tree().paused = false
 	shop_closed.emit()
-
-# --- Internal Logic ---
 
 func _rebuild_grid() -> void:
 	for child in grid_container.get_children():
@@ -92,10 +87,10 @@ func _rebuild_grid() -> void:
 		panel.custom_minimum_size = Vector2(70, 70)
 		panel.add_theme_stylebox_override("panel", style_normal)
 		
-		# NEW: Check ownership and apply gray effect
+		# Check ownership
 		var is_owned = item.id in _owned_ids
 		if is_owned:
-			panel.modulate = Color(0.5, 0.5, 0.5, 0.5) # Dim to 50% opacity
+			panel.modulate = Color(0.5, 0.5, 0.5, 0.5)
 		
 		if item.icon:
 			var tex_rect = TextureRect.new()
@@ -107,7 +102,7 @@ func _rebuild_grid() -> void:
 			tex_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			
 			if is_owned:
-				tex_rect.modulate = Color(0.3, 0.3, 0.3) # Darken icon specifically
+				tex_rect.modulate = Color(0.3, 0.3, 0.3)
 				
 			panel.add_child(tex_rect)
 			
@@ -146,12 +141,12 @@ func _confirm_selection() -> void:
 	if item_index >= 0 and item_index < _items.size():
 		var selected_item = _items[item_index]
 		
-		# NEW: Check ownership
 		if selected_item.id in _owned_ids:
 			_show_warning("Item already purchased!")
 			return
 
-		if _current_wallet < selected_item.cost and not Globals.debt:
+		# Shop Item is Upgrade
+		if not Globals.can_afford(selected_item.cost, _current_wallet, true):
 			_show_warning("Not enough money!")
 			return
 			
@@ -187,13 +182,13 @@ func _update_visuals() -> void:
 			
 			description_label.text = item.description
 			
-			# NEW: Handle Owned State
 			if item.id in _owned_ids:
 				cost_label.text = "OWNED"
-				cost_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5)) # Gray
+				cost_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 			else:
 				cost_label.text = "$ %d" % item.cost
-				if _current_wallet >= item.cost or Globals.debt:
+				# Shop Item is Upgrade
+				if Globals.can_afford(item.cost, _current_wallet, true):
 					cost_label.add_theme_color_override("font_color", Color(1, 0.84, 0)) # Gold
 				else:
 					cost_label.add_theme_color_override("font_color", Color(1, 0.2, 0.2)) # Red

@@ -33,7 +33,8 @@ func open(current_fuel: float, max_fuel: float, money: int) -> void:
 	elif _fuel_missing <= 0:
 		_cost = 0
 
-	_can_afford = (money >= _cost) or Globals.debt
+	# Refuel is NOT an upgrade
+	_can_afford = Globals.can_afford(_cost, money, false)
 	
 	# Update UI Text
 	wallet_label.text = "Funds: $%d" % money
@@ -69,6 +70,7 @@ func _input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("CANCEL") or event.is_action_pressed("ui_menu"):
 		close()
+		SoundManager.play_sfx("close")
 		get_viewport().set_input_as_handled()
 		return
 

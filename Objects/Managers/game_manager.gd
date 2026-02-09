@@ -3,7 +3,7 @@ extends Node
 
 enum GameState {SAFE, RUN}
 
-@export var player_start_pos: Vector2 = Vector2(-200, -32)
+@export var player_start_pos: Vector2 = Vector2(-270, -32)
 
 @export_group("References")
 @export var terrain_manager: TerrainManager
@@ -17,13 +17,21 @@ enum GameState {SAFE, RUN}
 @export var depth_ui: DepthUI
 @export var money_ui: MoneyUI
 @export var floating_text_scene: PackedScene
+@export var death_ui_scene: PackedScene
 
 var total_money: int = 10
 var _current_state: GameState = GameState.SAFE
 
 # --- Rebuild System State ---
 var is_robot_built: bool = false
-var has_pending_updates: bool = false
+
+# Computed property: Automatically true if active configuration differs from saved configuration
+var has_pending_updates: bool:
+	get:
+		if player and player.upgrades:
+			return player.upgrades.has_pending_changes()
+		return false
+
 const REBUILD_COST_PERCENTAGE: float = 0.5
 
 func _enter_tree() -> void:
@@ -42,6 +50,9 @@ func _ready() -> void:
 	
 	if money_ui:
 		money_ui.update_money(total_money)
+
+	# Start Music (Volume -10db to be background)
+	SoundManager.play_loop("music", 1.0, -10.0)
 
 func _connect_gameplay_signals() -> void:
 	if player:
@@ -68,31 +79,28 @@ func _connect_gameplay_signals() -> void:
 
 # --- Upgrade & Rebuild Logic ---
 
-func try_purchase_upgrade(item: ShopItem) -> void:
-	if total_money >= item.cost or Globals.debt:
+func try_purchase_upgrade(category_id: String, item: ShopItem) -> void:
+	# Buying an item is an UPGRADE (true)
+	if Globals.can_afford(item.cost, total_money, true):
 		total_money -= item.cost
 		if money_ui: money_ui.update_money(total_money)
 		
 		if player and player.upgrades:
 			# Store purchase but DO NOT apply stats yet
-			player.upgrades.purchase_item(item)
+			player.upgrades.purchase_item(category_id, item)
 			_spawn_floating_text("Purchased!", Color.GREEN)
-			
-			# Flag that we need an update, but don't break the robot if it was working
-			has_pending_updates = true
-		else:
-			push_error("Player or UpgradeManager missing!")
 	else:
 		_spawn_floating_text("Too Expensive!", Color.RED)
 
 func try_rebuild_robot(cost: int) -> bool:
-	if total_money >= cost or Globals.debt:
+	# Rebuilding is MAINTENANCE (false)
+	if Globals.can_afford(cost, total_money, false):
 		total_money -= cost
+		SoundManager.play_sfx("rebuild")
 		if money_ui: money_ui.update_money(total_money)
 		
-		# 1. Mark as built and up to date
+		# 1. Mark as built
 		is_robot_built = true
-		has_pending_updates = false
 		
 		# 2. Apply all stats (this refreshes stats with new items)
 		if player and player.upgrades:
@@ -100,7 +108,7 @@ func try_rebuild_robot(cost: int) -> bool:
 		
 		# 3. Update Visuals
 		if robot_entity:
-			robot_entity.set_active(true)
+			robot_entity.set_state(RobotEntity.State.FUNCTIONAL)
 
 		# 4. If player is inside the robot (updating while active), force eject
 		if player and player.current_mode != Player.MovementMode.NORMAL:
@@ -115,15 +123,17 @@ func try_rebuild_robot(cost: int) -> bool:
 		return false
 
 func try_purchase_refuel(cost: int) -> bool:
-	if total_money >= cost or Globals.debt:
+	# Refueling is MAINTENANCE (false)
+	if Globals.can_afford(cost, total_money, false):
 		total_money -= cost
 		if money_ui: money_ui.update_money(total_money)
 		
 		if player and player.stats:
 			var max_energy = player.stats.get_value("max_energy")
 			player.current_energy = max_energy
-			player.call("_emit_energy_update") # Refresh UI
+			player.call("_emit_energy_update")
 			_spawn_floating_text("Tank Refueled!", Color.GREEN)
+			SoundManager.play_sfx("refuel")
 		return true
 	else:
 		_spawn_floating_text("Funds Low", Color.RED)
@@ -158,11 +168,13 @@ func _on_player_entered_safezone() -> void:
 		if money_ui: money_ui.update_money(total_money)
 		_spawn_floating_text("Sold: $%d" % value, Color.GOLD)
 		player.inventory.clear()
+		SoundManager.play_sfx("sold")
 
 func _on_player_embarked() -> void:
 	if player:
 		player.enter_mech()
 		_spawn_floating_text("System Online", Color.CYAN)
+		SoundManager.play_sfx("embark")
 
 func _reset_game() -> void:
 	_current_state = GameState.SAFE
@@ -171,16 +183,17 @@ func _reset_game() -> void:
 		player.velocity = Vector2.ZERO
 		player.global_position = player_start_pos
 		if player.inventory: player.inventory.clear()
-		player.reset_all_stats() # This clears modifiers
+		player.reset_all_stats()
 		player.exit_mech()
+		SoundManager.stop_loop("thrust")
+		SoundManager.play_sfx("respawn")
 
 	if terrain_manager: terrain_manager.regenerate_map()
 	
 	# Death/Reset breaks the robot completely
 	is_robot_built = false
-	has_pending_updates = false # Updates aren't pending, the whole thing is broken
 	if robot_entity:
-		robot_entity.set_active(false)
+		robot_entity.set_state(RobotEntity.State.BROKEN)
 
 func start_run() -> void:
 	if _current_state == GameState.SAFE:
@@ -188,7 +201,19 @@ func start_run() -> void:
 
 func _on_energy_depleted() -> void:
 	_spawn_floating_text("Exhausted!", Color.RED)
+	SoundManager.play_sfx("death")
 	_end_round()
 
 func _end_round() -> void:
+	if death_ui_scene:
+		var ui = death_ui_scene.instantiate() as DeathUI
+		add_child(ui)
+		ui.open()
+		SoundManager.stop_loop("thrust")
+		ui.confirm_pressed.connect(_on_death_confirmed.bind(ui))
+	else:
+		_reset_game()
+
+func _on_death_confirmed(ui_instance: Node) -> void:
+	ui_instance.queue_free()
 	_reset_game()
